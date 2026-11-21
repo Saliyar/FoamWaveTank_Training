@@ -45,6 +45,10 @@ Post-processing scripts shared by all days live in `Tools/`.
 - `Tools/mooringToParaview.py` turns the MoorDyn line output (`Mooring/*_Line<N>.out`)
   into a ParaView time series `Mooring/Mooring.pvd` with segment tensions (Day 3, Day 4).
   From a case folder: `python3 ../../../Tools/mooringToParaview.py` (one frame per saved time folder)
+- `Tools/waveStats.py` prints the mean wave height, crest, trough and period at every
+  wave gauge of one or more cases (OpenFOAM `interfaceHeight`, waves2Foam gauges or
+  HOS-NWT probes), e.g. to check that Day 1 to Day 4 have the same incident wave:
+  `python3 Tools/waveStats.py <case1> <case2> --start 10`
 
 ## Status (Nov 2026)
 

@@ -1,0 +1,40 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# Day 1 - 04  The Day 2 regular wave in the empty tank (no box)
+#   Same tank, mesh and wave as Day2_FloatStepper/01_freeBoxRegularWaves
+#   (Ren et al. 2015): depth 0.4 m, x = 0 .. 8 m, box position x = 2 m.
+#   Waves:  OpenFOAM waveModels, StokesV, H = 0.1 m, T = 1.2 s,
+#           generated and absorbed at the inlet patch (constant/waveProperties)
+#   Solver: interIsoFoam (the VOF part of floatStepper)
+#
+# Usage:  ./Allrun
+#   Wave gauges -> postProcessing/interfaceHeight1 (x = 0, 1, 2, 3, 4, 5 m);
+#   the measured gauge record is in Ren2015data/H010WaveGauge.
+#------------------------------------------------------------------------------
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
+
+touch case.foam
+restore0Dir
+
+# 1. Mesh: background mesh and one refinement band around the free surface
+#    (Day 2 then cuts the box out of this mesh)
+runApplication blockMesh
+runApplication -s 1 topoSet -dict system/topoSetDict1
+runApplication -s 1 refineMesh -dict system/refineMeshDict1 -overwrite
+
+# Finer meshes (as in the paper): uncomment
+#runApplication -s 2 topoSet -dict system/topoSetDict2
+#runApplication -s 2 refineMesh -dict system/refineMeshDict2 -overwrite
+#runApplication -s 3 topoSet -dict system/topoSetDict3
+#runApplication -s 3 refineMesh -dict system/refineMeshDict3 -overwrite
+
+runApplication checkMesh
+
+# 2. Initial free surface (still water, z = 0.4 m)
+runApplication setAlphaField
+
+# 3. Run (serial)
+runApplication $(getApplication)
+
+#------------------------------------------------------------------------------

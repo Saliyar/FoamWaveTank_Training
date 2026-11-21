@@ -1,0 +1,42 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# Day 1 - 05  The Day 2 focused wave in the empty tank (no box)
+#   Same tank, mesh and wave as Day2_FloatStepper/02_freeBoxFocusedWave:
+#   depth 0.4 m, x = -2 .. 8 m (inlet relaxation zone -2 .. 0).
+#   Wave:   NewWave (JONSWAP, Tp = 1.2 s, etaMax = 0.06 m) focused on the
+#           box position x = 2 m at t = 10 s  -> constant/waveProperties.input
+#   Solver: waveIsoFoam (the VOF + waves2Foam part of floatStepperWaveFoam)
+#
+# Usage:  ./Allrun
+#   Wave gauges -> postProcessing/interfaceHeight1 (x = -1, 2, 1, 3, 4, 5 m)
+#------------------------------------------------------------------------------
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
+
+touch case.foam
+restore0Dir
+
+# 1. Mesh: background mesh and one refinement band around the free surface
+#    (Day 2 then cuts the box out of this mesh)
+runApplication blockMesh
+runApplication -s 1 topoSet -dict system/topoSetDict1
+runApplication -s 1 refineMesh -dict system/refineMeshDict1 -overwrite
+
+# Finer meshes (as in the paper): uncomment
+#runApplication -s 2 topoSet -dict system/topoSetDict2
+#runApplication -s 2 refineMesh -dict system/refineMeshDict2 -overwrite
+#runApplication -s 3 topoSet -dict system/topoSetDict3
+#runApplication -s 3 refineMesh -dict system/refineMeshDict3 -overwrite
+
+runApplication checkMesh
+
+# 2. Wave parameters (waveProperties.input -> waveProperties), relaxation
+#    zone layout (field for ParaView) and initial still-water surface z = 0.4
+runApplication setWaveParameters
+runApplication relaxationZoneLayout
+runApplication setAlphaField
+
+# 3. Run (serial)
+runApplication $(getApplication)
+
+#------------------------------------------------------------------------------

@@ -24,10 +24,37 @@ Surface elevation: `postProcessing/surfaceElevation/0/surfaceElevation.dat`.
 Things to try: change H or T, the length of the relaxation zones, the
 number of spectral components or the focus point and time.
 
+## The waves of Day 2, 3 and 4 in the empty tank (cases 04 - 06)
+
+The same tank, mesh, wave generation and gauges as the floating-body cases
+of the later days, without the body. Run them on Day 1 to see the incident
+wave the box will meet; compare with the Day 2 - 4 gauges upstream of the box.
+
+| Case | Same wave as | Wave | Tank | Solver |
+|------|--------------|------|------|--------|
+| `04_floatingBoxRegularWaves` | Day 2 `01_freeBoxRegularWaves` | StokesV, H = 0.1 m, T = 1.2 s (OpenFOAM waveModels) | depth 0.4 m, x = 0 .. 8 m | `interIsoFoam` |
+| `05_floatingBoxFocusedWave` | Day 2 `02_freeBoxFocusedWave` | NewWave JONSWAP, Tp = 1.2 s, crest 0.06 m at x = 2 m, t = 10 s (waves2Foam) | depth 0.4 m, x = -2 .. 8 m | `waveIsoFoam` |
+| `06_mooredBoxRegularWaves` | Day 3 and Day 4 | StokesII, H = 0.1195 m, T = 1.993 s (OpenFOAM waveModels) | depth 0.5 m, x = -2.5 .. 2.5 m | `interIsoFoam` |
+
+The box position is x = 2 m (Day 2) and x = 0 (Day 3, 4); each case has a
+gauge there. `04` and `05` use the fine Day 2 mesh (150 000 - 185 000 cells)
+and take 2 - 3 hours in serial; `06` takes about 10 minutes.
+
+Wave statistics at every gauge (mean wave height, crest, trough, period):
+
+```
+python3 ../../../Tools/waveStats.py . --start 8        # in a case folder
+```
+
+`04` also has the measured gauge record of the experiment
+(`Ren2015data/H010WaveGauge`, as in Day 2).
+
 ## Potential-flow waves: HOS-NWT and CFD (`HandsonExercise/potentialFlowWaves`)
 
 The same kinds of waves computed first with the potential-flow wave tank
 HOS-NWT (`HOS/`) and then in a shorter CFD domain coupled to it with Grid2Grid
 (`CFD/`): `RegularWaves`, `IrregularWaves`, `FocusingWaves` and
-`WavemakerMotion/{Piston,Flap}`. See `potentialFlowWaves/README.md`. HOS-NWT
-must be installed (https://gitlab.com/lheea/HOS-NWT).
+`WavemakerMotion/{Piston,Flap}`, and the Day 2 - 4 waves
+`FloatingBoxRegularWaves`, `FloatingBoxFocusedWave` and `MooredBoxRegularWaves`.
+See `potentialFlowWaves/README.md`. HOS-NWT must be installed
+(https://gitlab.com/lheea/HOS-NWT).

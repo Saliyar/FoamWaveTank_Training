@@ -20,6 +20,27 @@ CFD      x =            0 |inlet 2.5|  gauges 3..7  |7.5 outlet| 10 m
 | `WavemakerMotion/Piston` | regular, H = 0.08 m, T = 2 s, piston wavemaker | `type: regular`, `piston` | HOS t = 10 to 30 s |
 | `WavemakerMotion/Flap` | the same wave from a flap (hinged 0.1 m above the bottom) | `type: regular`, `hinged` | HOS t = 10 to 30 s |
 
+The waves of the floating-box days (the same waves as Day 1 cases `04` - `06`):
+
+| Folder | Wave | HOS | CFD time window |
+|--------|------|-----|-----------------|
+| `FloatingBoxRegularWaves` | Day 2a: H = 0.1 m, T = 1.2 s, depth 0.4 m | `type: regular` | HOS t = 15 to 35 s |
+| `FloatingBoxFocusedWave` | Day 2b: NewWave JONSWAP, Tp = 1.2 s, A = 0.06 m (0.4 - 2 Hz), depth 0.4 m, focused at HOS x = 9 m, t = 25 s (CFD x = 5 m, t = 10 s) | `type: file` | HOS t = 15 to 30 s |
+| `MooredBoxRegularWaves` | Day 3 and 4: H = 0.1195 m, T = 1.993 s, depth 0.5 m | `type: regular` | HOS t = 10 to 30 s |
+
+These three HOS cases use x-filtering 0.6 (steep waves). The HOS amplitude
+of `MooredBoxRegularWaves` is 0.0576 m, not H/2: the nonlinear HOS wave is
+higher than the linear one, and 0.0576 m gives the mean H = 0.1195 m of Day 3
+at the probes (`Tools/waveStats.py`). In this shallow-water wave (Ursell
+number 16) the piston also makes a free second harmonic, so H varies between
+0.110 and 0.132 m along the tank; HOS-NWT has no second-order wavemaker
+correction for this.
+
+`CFD/FloatingBoxRegularWaves` uses dx = 0.0125 m (nx 800) and maxCo 0.25:
+this short, steep wave (ka = 0.16) lost 15 % of its height over 4 m with the
+standard settings (dx = 0.025 m, maxCo 0.5) and still loses about 8 % (RMS
+difference to HOS 4 - 9 % of H). It runs in about 25 minutes.
+
 Each case has the same name under `HOS/` and `CFD/`.
 
 ## Running
