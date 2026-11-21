@@ -1,0 +1,96 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           |
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     floatStepperSWENSE;
+startFrom       startTime;
+startTime       0;
+stopAt          endTime;
+endTime         23;
+deltaT          0.0008;
+writeControl    adjustableRunTime;
+writeInterval   0.1;
+purgeWrite      0;
+writeFormat     ascii;
+writePrecision  16;
+writeCompression off;
+timeFormat      general;
+timePrecision   8;
+runTimeModifiable no;
+// Phase C shared numerics: fixed step (Rev1 has no adjustable time step)
+adjustTimeStep  yes;
+maxCo           0.5;
+maxAlphaCo      0.5;
+maxDeltaT       1;
+libs            ( "libwaves2Foam.so" "libGrid2Grid.so" "libfloaterMotion.so" moorDynForFloatStepper );
+
+// floatStepperSWENSE: pass-to-pass reset check off (debug only)
+checkReset      no;
+functions
+{
+    waveGauges
+    {
+        type            interfaceHeight;
+        libs            ( fieldFunctionObjects );
+        alpha           alpha.water;
+        direction       ( 0 0 1 );
+        locations       ( ( -2 0 -0.45 ) ( -1.5 0 -0.45 ) ( -1 0 -0.45 ) ( -0.5 0 -0.45 ) ( -0.25 0 -0.45 ) ( 0.25 0 -0.45 ) ( 0.5 0 -0.45 ) ( 1 0 -0.45 ) ( 1.5 0 -0.45 ) ( 2 0 -0.45 ) );
+        writeControl    timeStep;
+        writeInterval   1;
+    }
+    floaterMotion
+    {
+        type            floaterStateWriter;
+        libs            ( floaterStateWriter );
+        writeControl    timeStep;
+        writeInterval   1;
+        classicWriteFormat false;
+        bodyName        box;
+    }
+    box_forces
+    {
+        type            forces;
+        libs            ( forces );
+        patches         ( box );
+        pName           p;
+        rho             rho;
+        CofR            ( 0 0 0 );
+        writeControl    timeStep;
+        writeInterval   1;
+    }
+    box_forces_pInc
+    {
+        type            forces;
+        libs            ( forces );
+        patches         ( box );
+        pName           pInc;
+        rho             rho;
+        CofR            ( 0 0 0 );
+        writeControl    timeStep;
+        writeInterval   1;
+    }
+    box_forces_pc
+    {
+        type            forces;
+        libs            ( forces );
+        patches         ( box );
+        pName           pc;
+        rho             rho;
+        CofR            ( 0 0 0 );
+        writeControl    timeStep;
+        writeInterval   1;
+    }
+}

@@ -1,0 +1,50 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2206                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      waveProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// waves2Foam: no relaxation zones, waves from ESI waveModels BCs
+seaLevel        0;
+
+relaxationNames ();
+
+inlet
+{
+    alpha           alpha.water;
+
+    waveModel       StokesII;
+
+    nPaddle         1;
+
+    waveHeight      0.1195;
+
+    waveAngle       0.0;
+
+    rampTime        3.0;
+
+    activeAbsorption yes;
+
+    wavePeriod      1.993;
+}
+
+outlet
+{
+    alpha           alpha.water;
+
+    waveModel       shallowWaterAbsorption;
+
+    nPaddle         1;
+}
+
+// ************************************************************************* //

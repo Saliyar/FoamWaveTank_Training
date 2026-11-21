@@ -1,0 +1,23 @@
+# OpenFOAM run output (cases are shipped clean; run ./Allclean before committing)
+# time directories (1, 10, 0.5, 12.25 ...); case folders like 01_regularWaves are kept
+/**/HandsonExercise/**/[0-9]/
+/**/HandsonExercise/**/[0-9][0-9]/
+/**/HandsonExercise/**/[0-9][0-9][0-9]/
+/**/HandsonExercise/**/[0-9]*.[0-9]*/
+/**/HandsonExercise/**/0/
+/**/HandsonExercise/**/constant/polyMesh/
+/**/HandsonExercise/**/postProcessing/
+/**/HandsonExercise/**/processor*/
+/**/HandsonExercise/**/log.*
+/**/HandsonExercise/**/waveGaugesNProbes/
+/**/HandsonExercise/**/trajectory/
+/**/HandsonExercise/**/Mooring/VTK/
+/**/HandsonExercise/**/Mooring/*.out
+/**/HandsonExercise/**/Mooring/*.log
+/**/HandsonExercise/**/mdv2_body*
+*.foam
+slurm*.out
+run_start.txt
+run_end.txt
+core.*
+__pycache__/

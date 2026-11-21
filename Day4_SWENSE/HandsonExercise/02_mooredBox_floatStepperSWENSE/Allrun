@@ -1,0 +1,35 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# Day 4b - Moored box in regular waves, floatStepperSWENSE
+#   Same mesh, wave, box and MoorDyn lines as Day 3 / Day 4a.
+#   Body motion: FloatStepper (zero-acceleration pass -> added mass ->
+#   reset -> real pass every time step) on top of the Rev1 SWENSE solver.
+#   bodyZone (topoSet) must contain every moving point (fsZoneMotionTol).
+#
+# STATUS: set-up for Pass 4 of the floatStepperSWENSE validation; not yet
+# run to the end. Solver from the private build of branch
+# swense-rev1-floatstepper (build private_fs10). Override with
+#         FWT_FS=/path/to/build ./Allrun      (expects bin/ and lib/)
+#         SOLVER=/path/to/floatStepperSWENSE ./Allrun
+#------------------------------------------------------------------------------
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
+
+FWT_FS=${FWT_FS:-/gpfs/hpc-home/projects/dtu_00075/apps/FoamWaveTank/fwt_rev1_fs/private_fs10}
+SOLVER=${SOLVER:-$FWT_FS/bin/floatStepperSWENSE}
+[ -d "$FWT_FS/lib" ] && export LD_LIBRARY_PATH="$FWT_FS/lib:$LD_LIBRARY_PATH"
+
+touch case.foam
+restore0Dir
+
+# 1. Mesh (identical to Day 3) + SWENSE body zone from the morphing outer box
+runApplication blockMesh
+runApplication topoSet
+runApplication checkMesh
+
+# 2. Initial fields: built by the solver from the incident wave (see Day 4a)
+
+# 3. Run (serial). Wave gauges, forces and floater state -> postProcessing/
+runApplication $SOLVER
+
+#------------------------------------------------------------------------------

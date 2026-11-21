@@ -1,0 +1,87 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           |
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      dynamicMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Day 4b: moored box, floatStepperSWENSE (Pass 4 set-up, not yet validated).
+// Same box, mass, inertia and MoorDyn input as Day 3 / Day 4a.
+// floatStepperSWENSE requires that no point outside bodyZone moves
+// (fsZoneMotionTol), so the morphing region must lie inside bodyZone:
+//   lab frame, outer box x +-0.69, z -0.34 .. 0.11 (inside the zone; the
+//   zone cut z 0.1118 is 5 rows below the
+//   atmosphere). bodyZone is built by system/topoSetDict from the same outer
+//   box, cut at z < 0.1118.
+
+dynamicFvMesh   dynamicPointDisplacementFvMesh;
+
+solvers
+{
+    box
+    {
+        motionSolverLibs ( floaterMotion );
+
+        motionSolver    floaterMeshMotionSolver;
+
+        floaterMeshMotionSolverCoeffs
+        {
+            patches         (box);
+            // Rotation (pitch) is morphed with the radial distance from the
+            // box even with separateMeshMorphing. The box top (z 0.053) is
+            // only 0.059 m below the zone cut (0.1118), so outerDistance must
+            // stay below that (Day 3/4a use 0.075 / 0.4). Stopgap until the
+            // mesh gets a taller air region.
+            innerDistance   0.02;
+            outerDistance   0.055;
+
+            separateMeshMorphing true;
+            // Both morphing boxes in the lab frame and bounded in x AND z, so
+            // no point above the zone cut (or beyond x +-0.7) ever moves.
+            // Inner (rigid) box: E/S3 surge -0.12 .. +0.15 m -> body x range
+            // -0.22 .. 0.26 m. NOTE: E/S3 heave lifts the box top (z 0.053)
+            // to about 0.124 m, above the outer box zMax 0.1118 - a taller
+            // air region / higher zone cut is needed for the full motion.
+            xMorphing
+            {
+                relativeTo  lab;
+                innerBox { xMin -0.3; xMax 0.3; zMin -0.2;  zMax 0.08; }
+                outerBox { xMin -0.69; xMax 0.69; zMin -0.34; zMax 0.11; }  // just inside the grid lines x +-0.7, z -0.35, 0.1118
+            }
+            zMorphing
+            {
+                $xMorphing;
+            }
+
+            linDirs         (1 0 1);
+            rotDirs         (0 1 0);
+            addedMassModel  pisoAddedMass;
+            MaddUpdateFreq  1;
+
+            restraints
+            {
+                moorDynR2_body
+                {
+                    floaterMotionRestraint  moorDynR2;
+                    couplingMode        "BODY";
+                    inputFile           "Mooring/lines_v2_bodyC.txt";
+                    vtkPrefix           "mdv2_body";
+                    writeMooringVTK     true;
+                    vtkStartTime        0;
+                    outerCorrector      1;
+                }
+            }
+        }
+    }
+}
+
+// ************************************************************************* //

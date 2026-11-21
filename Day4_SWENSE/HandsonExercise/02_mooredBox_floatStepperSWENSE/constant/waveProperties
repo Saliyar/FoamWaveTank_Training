@@ -1,0 +1,99 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           |
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      waveProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Phase C: Rev1 with the plain WIF_R2_30s StokesII wave
+externalForcing waveTheoryForcing;
+airFill         air2air;
+limitedClosure  true;
+limitedClosureRatio 2;
+plainBodyZone   bodyZone;
+seaLevel        0;
+// Phase C5: start-up ramp of the incident (swenseRamp.H)
+rampTsoft       3;
+relaxationNames ();
+
+// Plain ESI wave dictionaries, verbatim from WIF_R2_30s/constant/waveProperties.
+// StokesIIIncident reads inlet (rampTime is not used by Rev1)
+inlet
+{
+    alpha           alpha.water;
+
+    waveModel       StokesII;
+
+    nPaddle         1;
+
+    waveHeight      0.1195;
+
+    waveAngle       0.0;
+
+    rampTime        3.0;
+
+    activeAbsorption yes;
+
+    wavePeriod      1.993;
+}
+
+outlet
+{
+    alpha           alpha.water;
+
+    waveModel       shallowWaterAbsorption;
+
+    nPaddle         1;
+}
+
+waveTheoryForcingCoeffs
+{
+    waveType        StokesIIIncident;
+    waveDict        inlet;
+    Tsoft           0;
+}
+
+farfieldCoeffs
+{
+    zCutOff             0.5;
+    relaxationZone
+    {
+        farfieldPatchNames  (inlet outlet);
+        farfieldDistances   (1.0 1.0);
+        blendingDistances   (1.0 1.0);
+        spatialExponent     3.5;
+    }
+    Air2Air
+    {
+        order           3;
+        pressureModel   linear;
+        verbose         yes;
+        cutoff          auto;
+        cutoffC         1;
+        source          theory;
+        nModes          64;
+        rhoAir          1;
+    }
+}
+
+// SWENSE boundary wave blocks: no ramp
+inletCoeffs
+{
+    rampTime    0;
+    wind        (0 0 0);
+}
+outletCoeffs
+{
+    rampTime    0;
+    wind        (0 0 0);
+}
