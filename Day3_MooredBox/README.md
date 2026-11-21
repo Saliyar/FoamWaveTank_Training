@@ -17,14 +17,15 @@ one hour; this will be shortened for the course.
 
 After the run (or while it runs), in the case folder:
 
-    python3 ../../../Tools/mooringToParaview.py                  # every MoorDyn output time
-    python3 ../../../Tools/mooringToParaview.py --dt 0.1         # one frame per 0.1 s
-    python3 ../../../Tools/mooringToParaview.py --start 5 --end 20 --dt 0.05
+    python3 ../../../Tools/mooringToParaview.py                  # one frame per saved time folder
+    python3 ../../../Tools/mooringToParaview.py --start 5 --end 20
 
-(or give the case folder as argument: `python3 Tools/mooringToParaview.py <case> --dt 0.1`).
+(or give the case folder as argument: `python3 Tools/mooringToParaview.py <case>`).
+The frames follow the time folders the solver wrote (writeInterval in
+`system/controlDict`), so mooring and flow have the same times in ParaView.
 
 It reads `Mooring/*_Line<N>.out` (node positions and segment tensions) and
-writes `Mooring/VTP/mooring_*.vtp` plus the time series `Mooring/Mooring.pvd`.
+writes `Mooring/VTP/mooring_<time>.vtp` plus the time series `Mooring/Mooring.pvd`.
 Open `case.foam` and `Mooring/Mooring.pvd` together in ParaView; the times
 match the flow solution. Colour the lines by `Tension` (N per segment) or
 `LineID`. Needs only numpy.
