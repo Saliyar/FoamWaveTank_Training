@@ -5,7 +5,7 @@ cd "${0%/*}" || exit 1
 cleanCase0
 rm -f case.foam
 # MoorDyn output (keep the input file lines_v2_bodyC.txt)
-rm -rf Mooring/VTK Mooring/*.out Mooring/*.log
+rm -rf Mooring/VTK Mooring/VTP Mooring/Mooring.pvd Mooring/*.out Mooring/*.log
 rm -rf mdv2_body*
 rm -f constant/polyMesh/sets/* 2>/dev/null
 

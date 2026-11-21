@@ -12,6 +12,8 @@
 /**/HandsonExercise/**/waveGaugesNProbes/
 /**/HandsonExercise/**/trajectory/
 /**/HandsonExercise/**/Mooring/VTK/
+/**/HandsonExercise/**/Mooring/VTP/
+/**/HandsonExercise/**/Mooring/Mooring.pvd
 /**/HandsonExercise/**/Mooring/*.out
 /**/HandsonExercise/**/Mooring/*.log
 /**/HandsonExercise/**/mdv2_body*

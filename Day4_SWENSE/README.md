@@ -17,3 +17,8 @@ use another build.
 Case 02 is not yet validated. floatStepperSWENSE requires all moving mesh
 points to lie inside `bodyZone`, so its zone comes from `system/topoSetDict`
 and its mesh morphing from `constant/dynamicMeshDict` (not the zone of case 01).
+
+## Mooring lines in ParaView
+
+Both cases include `mooringToParaview.py`; see the Day 3 README
+(`python3 mooringToParaview.py --dt 0.1`, then open `Mooring/Mooring.pvd`).

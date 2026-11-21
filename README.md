@@ -30,6 +30,12 @@ paraview case.foam
 Logs are written to `log.<application>`; wave gauges, forces and body
 motions go to `postProcessing/`.
 
+## Tools
+
+`tools/mooringToParaview.py` turns the MoorDyn line output (`Mooring/*_Line<N>.out`)
+into a ParaView time series `Mooring/Mooring.pvd` with segment tensions. A copy is in
+each moored-box case (Day 3, Day 4); run `python3 mooringToParaview.py` in the case folder.
+
 ## Status (Nov 2026)
 
 - Day 1 runs in serial in 5 to 10 minutes (regular 5.0, irregular 10.3,
