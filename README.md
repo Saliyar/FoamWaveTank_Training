@@ -32,9 +32,11 @@ motions go to `postProcessing/`.
 
 ## Tools
 
-`tools/mooringToParaview.py` turns the MoorDyn line output (`Mooring/*_Line<N>.out`)
-into a ParaView time series `Mooring/Mooring.pvd` with segment tensions. A copy is in
-each moored-box case (Day 3, Day 4); run `python3 mooringToParaview.py` in the case folder.
+Post-processing scripts shared by all days live in `Tools/`.
+
+- `Tools/mooringToParaview.py` turns the MoorDyn line output (`Mooring/*_Line<N>.out`)
+  into a ParaView time series `Mooring/Mooring.pvd` with segment tensions (Day 3, Day 4).
+  From a case folder: `python3 ../../../Tools/mooringToParaview.py --dt 0.1`
 
 ## Status (Nov 2026)
 

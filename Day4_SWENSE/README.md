@@ -20,5 +20,5 @@ and its mesh morphing from `constant/dynamicMeshDict` (not the zone of case 01).
 
 ## Mooring lines in ParaView
 
-Both cases include `mooringToParaview.py`; see the Day 3 README
-(`python3 mooringToParaview.py --dt 0.1`, then open `Mooring/Mooring.pvd`).
+Use `Tools/mooringToParaview.py` as in the Day 3 README: from a case folder,
+`python3 ../../../Tools/mooringToParaview.py --dt 0.1`, then open `Mooring/Mooring.pvd`.

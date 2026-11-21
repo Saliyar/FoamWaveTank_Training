@@ -5,8 +5,10 @@ Based on MooringVisualizationInParaview.py by Sithik Aliyar.
 
 Run it from the case folder after the simulation (or while it runs):
 
-    python3 mooringToParaview.py                 # all output times
-    python3 mooringToParaview.py --start 5 --end 20 --dt 0.05
+    python3 ../../../Tools/mooringToParaview.py                 # all output times
+    python3 ../../../Tools/mooringToParaview.py --start 5 --end 20 --dt 0.05
+
+or pass the case folder:  python3 Tools/mooringToParaview.py <case-folder> --dt 0.1
 
 It reads the MoorDyn line files  Mooring/<prefix>_Line<N>.out  (or Mooring/Line<N>.out)
 and writes

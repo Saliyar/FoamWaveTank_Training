@@ -17,9 +17,11 @@ one hour; this will be shortened for the course.
 
 After the run (or while it runs), in the case folder:
 
-    python3 mooringToParaview.py                  # every MoorDyn output time
-    python3 mooringToParaview.py --dt 0.1         # one frame per 0.1 s
-    python3 mooringToParaview.py --start 5 --end 20 --dt 0.05
+    python3 ../../../Tools/mooringToParaview.py                  # every MoorDyn output time
+    python3 ../../../Tools/mooringToParaview.py --dt 0.1         # one frame per 0.1 s
+    python3 ../../../Tools/mooringToParaview.py --start 5 --end 20 --dt 0.05
+
+(or give the case folder as argument: `python3 Tools/mooringToParaview.py <case> --dt 0.1`).
 
 It reads `Mooring/*_Line<N>.out` (node positions and segment tensions) and
 writes `Mooring/VTP/mooring_*.vtp` plus the time series `Mooring/Mooring.pvd`.
