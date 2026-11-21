@@ -42,7 +42,7 @@ solvers
     {
         tolerance        1e-05;
         relTol           0.0;
-        preconditioner  DILU;
+        preconditioner  DIC;      // PCG needs a symmetric preconditioner
         smoother         DIC;//GaussSeidel;
         nPreSweeps       0;
         nPostSweeps      2;

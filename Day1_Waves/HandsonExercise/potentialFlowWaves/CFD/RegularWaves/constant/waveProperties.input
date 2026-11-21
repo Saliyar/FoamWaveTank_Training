@@ -1,0 +1,82 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2506                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      waveProperties.input;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Wave: regular wave H = 0.08 m, T = 1.5 s (piston)
+// computed by HOS-NWT in ../../HOS/RegularWaves, read through Grid2Grid.
+
+seaLevel            0.0;
+
+relaxationNames     (inlet outlet);
+
+initializationName  inlet;      // t = 0 field from the HOS solution (setWaveField)
+
+externalForcing     Grid2Grid;
+
+Grid2GridCoeffs
+{
+    waveType                Grid2Grid;
+    Grid2GridInputFileName  Grid2Grid.dict;   // in constant/
+
+    // Mapping CFD -> HOS:  x_HOS = x_CFD - referencePosition,  t_HOS = t_CFD + referenceTime
+    referencePosition       (-4 0 0);         // CFD x = 0 is HOS x = 4 m
+    referenceTheta          0;
+    referenceTime           10;               // CFD t = 0 is HOS t = 10 s (waves already in the domain)
+    Tsoft                   0;
+}
+
+// Both zones relax towards the HOS solution: the inlet generates it and the
+// outlet absorbs what the CFD adds (reflections) since the HOS wave leaves
+// the domain on its own.
+inletCoeffs
+{
+    waveType                externalSource;
+    Grid2GridInputFileName  Grid2Grid.dict;
+    Tsoft                   0;    // must be 0, otherwise setWaveField starts from still water
+
+    relaxationZone
+    {
+        relaxationScheme Spatial;
+        relaxationShape  Rectangular;
+        beachType        Empty;
+
+        relaxType   INLET;
+        startX      (0 0 -1);
+        endX        (2.5 0  1);
+        orientation (1 0 0);
+    }
+};
+
+outletCoeffs
+{
+    waveType                externalSource;
+    Grid2GridInputFileName  Grid2Grid.dict;
+    Tsoft                   0;    // must be 0, otherwise setWaveField starts from still water
+
+    relaxationZone
+    {
+        relaxationScheme Spatial;
+        relaxationShape  Rectangular;
+        beachType        Empty;
+
+        relaxType   OUTLET;
+        startX      (7.5 0 -1);
+        endX        (10 0  1);
+        orientation (1 0 0);
+    }
+};
+
+// ************************************************************************* //

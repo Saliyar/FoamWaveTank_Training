@@ -16,6 +16,9 @@ serial run) and an `Allclean` (resets the case to the state in git).
 - OpenFOAM v2506 (openfoam.com)
 - FoamWaveTank (waves2Foam, waveIsoFoam, waveIsoFoamSWENSE, MoorDyn
   restraints, FloatStepper), compiled with `./Allwmake`
+- HOS-NWT (https://gitlab.com/lheea/HOS-NWT) on the `PATH` for Day 1
+  `potentialFlowWaves` (needs LAPACK and FFTW at run time)
+- Python 3 with numpy (matplotlib for the plots) for the `Tools/` scripts
 
 ## Running an exercise
 
@@ -34,6 +37,11 @@ motions go to `postProcessing/`.
 
 Post-processing scripts shared by all days live in `Tools/`.
 
+- `Tools/compareHOS_CFD.py` plots the CFD wave gauges against the HOS-NWT probes
+  of the coupled case (Day 1 `potentialFlowWaves/CFD`). From a CFD case folder:
+  `python3 <repo>/Tools/compareHOS_CFD.py`
+- `Tools/makeFocusedWaveHOS.py` writes the HOS-NWT wavemaker files (`.cfg`/`.dat`) for a
+  focused wave group (Day 1 `potentialFlowWaves/HOS/FocusingWaves`).
 - `Tools/mooringToParaview.py` turns the MoorDyn line output (`Mooring/*_Line<N>.out`)
   into a ParaView time series `Mooring/Mooring.pvd` with segment tensions (Day 3, Day 4).
   From a case folder: `python3 ../../../Tools/mooringToParaview.py` (one frame per saved time folder)

@@ -1,0 +1,46 @@
+# HOS-NWT input file - focused wave group
+# 2D numerical wave tank, 20 m long, 0.5 m deep; wavemaker at x = 0,
+# absorbing beach from x = 15 m. The CFD case uses the part x = 4 .. 14 m.
+wave tank:
+  dimensions:          # m
+    length: 20.
+    depth: 0.5
+  wavemaker:
+    type: piston
+  numerical absorption beach:
+    position ratio: 0.75   # beach starts at 0.75 * 20 = 15 m
+    absorption coefficient: 1.
+
+computation case:
+  3D: false
+  type: file
+  format: cfg+dat
+  file: focusedWave    # focusedWave.cfg + focusedWave.dat (Tools/makeFocusedWaveHOS.py)
+time:
+  duration: 32.0      # s (CFD case: referenceTime + endTime)
+  ramping:
+    order: 2          # smooth start of the wavemaker
+    duration: 3.      # s
+
+numerical parameters:
+  time integration tolerance: 1.e-5
+  discretization:
+    x: 512             # modes along x (dx = 0.039 m)
+    z: 17              # modes on the wavemaker
+  HOS nonlinearity order: 3
+  wavemaker nonlinearity order: 2
+  dealiasing:
+    x: 3
+
+output:
+  directory: Results
+  frequency: 20.         # Hz, also the time resolution of the modes file
+  dimensional: true
+  free surface: false
+  modes: false
+  wavemaker motion: true # Results/wmk_motion.dat
+  volumic modal data: standard   # Results/modes_HOS_SWENSE.dat for Grid2Grid
+  HDF5: false
+  probes:
+    type: free surface elevation
+    position file: prob.inp      # x = 7 .. 11 m (CFD gauges x = 3 .. 7 m)

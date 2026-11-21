@@ -23,3 +23,11 @@ Surface elevation: `postProcessing/surfaceElevation/0/surfaceElevation.dat`.
 
 Things to try: change H or T, the length of the relaxation zones, the
 number of spectral components or the focus point and time.
+
+## Potential-flow waves: HOS-NWT and CFD (`HandsonExercise/potentialFlowWaves`)
+
+The same kinds of waves computed first with the potential-flow wave tank
+HOS-NWT (`HOS/`) and then in a shorter CFD domain coupled to it with Grid2Grid
+(`CFD/`): `RegularWaves`, `IrregularWaves`, `FocusingWaves` and
+`WavemakerMotion/{Piston,Flap}`. See `potentialFlowWaves/README.md`. HOS-NWT
+must be installed (https://gitlab.com/lheea/HOS-NWT).

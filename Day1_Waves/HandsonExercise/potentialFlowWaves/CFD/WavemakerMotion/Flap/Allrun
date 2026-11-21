@@ -1,0 +1,37 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# Day 1 - CFD with the HOS-NWT wave field (Grid2Grid coupling), waveIsoFoam
+#   Wave:    regular wave H = 0.08 m, T = 2 s from a flap wavemaker
+#   HOS:     ../../../HOS/WavemakerMotion/Flap  (run first if its Results are missing)
+#   Mapping: constant/waveProperties.input (referencePosition, referenceTime)
+#   Gauges:  constant/probeDefinitions (x = 3 .. 7 m)
+#
+# Usage:  ./Allrun        (serial, local machine)
+#------------------------------------------------------------------------------
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
+
+HOS=../../../HOS/WavemakerMotion/Flap
+
+# 0. HOS-NWT wave field (runs HOS-NWT if there is no complete result yet)
+"$HOS/Allrun" || { echo "No complete HOS-NWT result in $HOS: stop"; exit 1; }
+
+touch case.foam
+restore0Dir
+
+# 1. Mesh
+runApplication blockMesh
+runApplication checkMesh
+
+# 2. Wave set-up from the HOS solution
+runApplication setWaveParameters       # waveProperties.input -> waveProperties
+runApplication relaxationZoneLayout    # relaxation weight field
+runApplication setWaveField            # alpha, U of the HOS wave at t = 0
+
+# 3. Wave gauges (function object included by system/controlDict)
+runApplication waveGaugesNProbes
+
+# 4. Run (serial)
+runApplication $(getApplication)
+
+#------------------------------------------------------------------------------

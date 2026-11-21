@@ -23,3 +23,9 @@ run_start.txt
 run_end.txt
 core.*
 __pycache__/
+# HOS-NWT and Grid2Grid output
+/**/HandsonExercise/**/HOS/**/Results/
+/**/HandsonExercise/**/log.HOS-NWT
+/**/HandsonExercise/**/VTKGrid2Grid/
+/**/HandsonExercise/**/VTK\\Grid2Gridsurf2volMesh.vtk
+/**/HandsonExercise/**/compareHOS_CFD.png
