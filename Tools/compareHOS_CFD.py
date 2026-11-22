@@ -80,6 +80,7 @@ def main():
     ref = foam_value(wp, "referencePosition")
     x0 = float(ref.strip("()").split()[0]) if ref else 0.0
     t0 = float(foam_value(wp, "referenceTime") or 0.0)
+    sea = float(foam_value(wp, "seaLevel") or 0.0)  # the CFD gauges give the absolute level z
 
     hos = a.hos
     if hos is None:
@@ -89,6 +90,7 @@ def main():
     hos = os.path.abspath(hos)
 
     xc, tc, ec = read_cfd(case)
+    ec = ec - sea
     xh, th, eh = read_hos(hos)
     print("CFD %s\nHOS %s\nmapping: x_HOS = x_CFD + %g,  t_HOS = t_CFD + %g" % (case, hos, -x0, t0))
     print("%8s %8s %10s %10s %10s" % ("x_CFD", "x_HOS", "H_HOS", "RMS diff", "RMS/H"))
@@ -96,7 +98,7 @@ def main():
     pairs = []
     for i, x in enumerate(xc):
         j = int(np.argmin(np.abs(xh - (x - x0))))
-        if abs(xh[j] - (x - x0)) > 1e-3:
+        if abs(xh[j] - (x - x0)) > 1.5e-3:
             print("%8.3f   no HOS probe at x_HOS = %g" % (x, x - x0))
             continue
         hos_on_cfd = np.interp(tc + t0, th, eh[:, j], left=np.nan, right=np.nan)

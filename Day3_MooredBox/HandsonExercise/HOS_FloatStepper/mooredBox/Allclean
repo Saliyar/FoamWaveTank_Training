@@ -1,0 +1,14 @@
+#!/bin/sh
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?}/bin/tools/CleanFunctions
+
+cleanCase0
+./HOS/Allclean
+rm -rf VTKGrid2Grid "VTK\\Grid2Gridsurf2volMesh.vtk"   # written by Grid2Grid
+rm -f system/meshSize
+rm -rf case.foam constant/waveProperties compareHOS_CFD.png
+# MoorDyn output (keep the input file lines_v2_bodyC.txt)
+rm -rf Mooring/VTK Mooring/VTP Mooring/Mooring.pvd Mooring/*.out Mooring/*.log
+rm -rf mdv2_body*
+
+#------------------------------------------------------------------------------

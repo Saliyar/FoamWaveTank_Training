@@ -1,0 +1,50 @@
+# HOS-NWT input file - Day 2 regular wave (floating box, Ren et al. 2015 tank)
+# 2D numerical wave tank, 20 m long, 0.4 m deep; wavemaker at x = 0,
+# absorbing beach from x = 15 m. The CFD case uses the part x = 5 .. 15 m.
+wave tank:
+  dimensions:          # m
+    length: 20.
+    depth: 0.4
+  wavemaker:
+    type: piston
+  numerical absorption beach:
+    position ratio: 0.75   # beach starts at 0.75 * 20 = 15 m
+    absorption coefficient: 1.
+
+computation case:
+  3D: false
+  type: regular
+  amplitude: 0.05      # m: H = 0.1 m as Day 2 01_freeBoxRegularWaves (HOS gives
+                       # a mean H = 0.0995 m at the probes, Tools/waveStats.py)
+  frequency: 0.833333  # Hz (T = 1.2 s)
+time:
+  duration: 20.0      # s (CFD case: referenceTime + endTime = 19 s, plus a margin)
+  ramping:
+    order: 2          # smooth start of the wavemaker
+    duration: 3.      # s
+
+numerical parameters:
+  time integration tolerance: 1.e-5
+  discretization:
+    x: 512             # modes along x (dx = 0.039 m)
+    z: 17              # modes on the wavemaker
+  HOS nonlinearity order: 3
+  wavemaker nonlinearity order: 2
+  dealiasing:
+    x: 3
+  filtering coefficients:   # modes above 0.6 * x (wave length < 0.13 m) are set
+    x: 0.6                  # to zero: keeps these steep cases stable
+    z: 1.
+
+output:
+  directory: Results
+  frequency: 20.         # Hz, also the time resolution of the modes file
+  dimensional: true
+  free surface: false
+  modes: false
+  wavemaker motion: true # Results/wmk_motion.dat
+  volumic modal data: standard   # Results/modes_HOS_SWENSE.dat for Grid2Grid
+  HDF5: false
+  probes:
+    type: free surface elevation
+    position file: prob.inp      # at the CFD gauges and the box centre (x = 9 m)

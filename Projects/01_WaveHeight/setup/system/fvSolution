@@ -1,0 +1,103 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           |
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    "(alpha.water|alphaI).*"
+    {
+        isoFaceTol      1e-6;
+        surfCellTol     1e-2;
+        nAlphaBounds    3;
+        snapTol         1e-12;
+        clip            true;
+        nAlphaSubCycles 1;
+        nAlphaCorr      3;
+        cAlpha          1;
+        reconstructionScheme plicRDF;
+    }
+    "pcorr.*"
+    {
+        solver          PCG;
+        preconditioner
+        {
+            preconditioner  GAMG;
+            tolerance       1e-5;
+            relTol          0;
+            smoother        DICGaussSeidel;
+            cacheAgglomeration no;
+        }
+        tolerance       1e-05;
+        relTol          0;
+        maxIter         200;
+    }
+    "(p_rgh|pc)"
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-06;
+        relTol          0;
+    }
+    "(p_rghFinal|pcFinal)"
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-07;
+        relTol          0;
+    }
+    "(U|Uc|k|epsilon)"
+    {
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-6;
+        relTol          0;
+    }
+    "(U|Uc|k|epsilon)Final"
+    {
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-6;
+        relTol          0;
+    }
+    // Rev1 only (incident projection), as the 6b case
+    psiProj
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-10;
+        relTol          0;
+    }
+}
+
+PIMPLE
+{
+    momentumPredictor   no;
+    nOuterCorrectors    1;
+    nCorrectors         3;
+    nNonOrthogonalCorrectors 1;
+    // waveIsoFoam default for a moving mesh (correctPhi = mesh.dynamic()),
+    // written out so both solvers read the same value
+    correctPhi          yes;
+    moveMeshOuterCorrectors no;
+}
+
+relaxationFactors
+{
+    equations
+    {
+        ".*" 1;
+    }
+}

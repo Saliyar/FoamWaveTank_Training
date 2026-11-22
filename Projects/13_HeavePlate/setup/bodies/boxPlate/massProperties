@@ -1,0 +1,4 @@
+// Box + plate 0.30 x 0.20 x 0.02 m; plate mass = its displacement, so the draft is kept
+mass            4.348;
+centreOfMass    (0 0 -0.0336);
+momentOfInertia (0.0241 0.0308 0.034);

@@ -2,7 +2,7 @@
 
 Freely floating box (0.3 m x 0.2 m, 12 kg, surge, heave and pitch free) in
 the Ren et al. (2015) wave tank, depth 0.4 m. The same two tutorials are run
-with two body-motion solvers:
+with two body-motion solvers, and with the wave from HOS-NWT:
 
 - `FloatStepper/`: the FloatStepper algorithm (Roenby et al. 2024, Royal Society
   Open Science, https://doi.org/10.1098/rsos.231453), `floaterMeshMotionSolver`
@@ -13,6 +13,7 @@ with two body-motion solvers:
 - `waveIsoFoam/`: `waveIsoFoam` with the OpenFOAM `sixDoFRigidBodyMotion`
   solver (Newmark). The mesh motion, the box boundary conditions
   and the output differ; the box is cut out directly at x = 2 m.
+- `HOS_FloatStepper/`: FloatStepper with the incident wave from HOS-NWT through Grid2Grid (see below).
 
 | Case (in both folders) | Wave | `FloatStepper/` | `waveIsoFoam/` |
 |------|------|------|------|
@@ -40,6 +41,42 @@ to x = -2 m for the inlet relaxation zone.
 `waveIsoFoam` here needs a build with moving-mesh support. `Allrun` defaults to the development
 build on the DTU cluster; elsewhere use `SOLVER=/path/to/waveIsoFoam ./Allrun`
 (or `FWT_PLAIN=/path/to/build`, with `bin/` and `lib/`).
+
+## HOS-NWT + FloatStepper (`HandsonExercise/HOS_FloatStepper`)
+
+The same box, mesh and numerics as `FloatStepper/02_freeBoxFocusedWave` (`floatStepperWaveFoam`),
+with the Day 1 HOS waves in both relaxation zones and in the initial field.
+
+| Case | Wave (as Day 1 `potentialFlowWaves/HOS`) | CFD t = 0 is HOS | `endTime` | HOS + CFD, serial |
+|------|------|-----:|-----:|-----:|
+| `01_freeBoxRegularWaves` | `FloatingBoxRegularWaves` | 5 s | 14 s | 26 min |
+| `02_freeBoxFocusedWave` | `FloatingBoxFocusedWave`, focus at the box at t = 10 s | 15 s | 12 s | 17 min |
+
+`./Allrun` runs HOS-NWT first (3-4 min, skipped if `HOS/Results` is complete). It needs LAPACK
+and FFTW at run time (on the DTU cluster: `module load lapack/3.11.0 fftw/3.3.10`);
+`HOSNWT=/path/to/HOS-NWT ./Allrun` to use another build. `./Allclean` also deletes the HOS result.
+
+The coupling is the one of Day 1 `potentialFlowWaves`, with two differences for a floating body:
+
+- `referenceTime` is chosen so that the waves are upstream and the water at the box is almost
+  calm (< 0.6 mm) at CFD t = 0. Day 1 starts inside the developed wave, which would give the
+  box at rest an impulsive start.
+- The box centre is at HOS x = 9 m (`referencePosition`), and both relaxation zones are outside
+  the morphing mesh around the box.
+
+`setWaveField` warns that Tsoft is non-zero and that it starts from still water. Ignore this for
+`externalSource`: the warning is always printed, and the HOS field is set. `Allrun` stops if
+`setWaveField` is a build that does not update Grid2Grid to the start time.
+
+Gauges against HOS, after the run: `python3 ../../../../Tools/compareHOS_CFD.py`
+
+Without the box the wave is within 0.4 % (RMS/H) of HOS at x = -1 m. On this coarse mesh it loses
+about 10 % of its height on the way to the box, so compare with the gauges, not only with the input.
+
+Compared with `FloatStepper/`: regular waves (t = 7.8 - 14 s, amplitudes) surge +12 %, heave +13 %,
+pitch -2 %; focused wave (t = 8 - 12 s, ranges) surge -4 %, heave +9 %, pitch +4 %. The waves are
+not identical: HOS is nonlinear and has a wavemaker. `compareExpNum.py` does not apply here,
+because the phase of the wave differs.
 
 ## How accurate is the course set-up?
 

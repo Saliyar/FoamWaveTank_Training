@@ -1,0 +1,32 @@
+# Run output of the project cases (Projects/<project>/<case>/...)
+# time folders
+/*/*/[0-9]/
+/*/*/[0-9][0-9]/
+/*/*/[0-9]*.[0-9]*/
+/*/*/constant/polyMesh/
+/*/*/postProcessing/
+/*/*/processor*/
+/*/*/log.*
+/*/*/system/meshSize
+/*/*/system/decomposeParDict
+/*/*/Mooring/VTK/
+/*/*/Mooring/VTP/
+/*/*/Mooring/Mooring.pvd
+/*/*/Mooring/*.out
+/*/*/Mooring/*.log
+/*/*/mdv2_body*
+/*/*/HOS/Results/
+/*/*/HOS/log.HOS-NWT
+# written by Allrun from the options
+/06_*/*/Mooring/lines_v2_bodyC.txt
+/09_*/*/constant/turbulenceProperties
+/10_*/*/system/blockMeshDict
+/10_*/*/constant/massProperties
+/10_*/*/Mooring/lines_v2_bodyC.txt
+/13_*/*/system/blockMeshDict
+/13_*/*/constant/massProperties
+/13_*/*/Mooring/lines_v2_bodyC.txt
+*.foam
+slurm*.out
+/*/*/VTKGrid2Grid/
+/*/*/VTK*Grid2Gridsurf2volMesh.vtk

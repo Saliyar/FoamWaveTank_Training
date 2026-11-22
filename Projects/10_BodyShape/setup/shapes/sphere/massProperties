@@ -1,0 +1,4 @@
+// Sphere R 0.1146 m, half submerged: same mass
+mass            3.148;
+centreOfMass    (0 0 -0.0126);
+momentOfInertia (0.0167 0.0167 0.0167);

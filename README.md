@@ -7,17 +7,25 @@ serial run) and an `Allclean` (resets the case to the state in git).
 | Day | Topic | Exercises (`DayN_*/HandsonExercise/`) | Solver |
 |-----|-------|----------------------------------------|--------|
 | 1 | Waves | `waveFoam/` and `waveIsoFoam/`, each with `01_regularWaves`, `02_irregularWaves`, `03_focusedWave`; `potentialFlowWaves/` | `waveFoam`, `waveIsoFoam`, HOS-NWT + Grid2Grid |
-| 2 | Free floating box | `waveIsoFoam/` and `FloatStepper/`, each with `01_freeBoxRegularWaves`, `02_freeBoxFocusedWave` | `waveIsoFoam` + sixDoF; `floatStepper`, `floatStepperWaveFoam` |
-| 3 | Moored floating box | `waveIsoFoam/mooredBox`, `FloatStepper/mooredBox` | `waveIsoFoam` + sixDoF + MoorDyn; `floatStepper` + MoorDyn |
+| 2 | Free floating box | `waveIsoFoam/` and `FloatStepper/`, each with `01_freeBoxRegularWaves`, `02_freeBoxFocusedWave`; the same two in `HOS_FloatStepper/` | `waveIsoFoam` + sixDoF; `floatStepper`, `floatStepperWaveFoam`; HOS-NWT + Grid2Grid |
+| 3 | Moored floating box | `waveIsoFoam/mooredBox`, `FloatStepper/mooredBox`; `HOS_FloatStepper/mooredBox` and `mooredBoxFocusedWave` | `waveIsoFoam` + sixDoF + MoorDyn; `floatStepper` + MoorDyn; HOS-NWT + `floatStepperWaveFoam` |
 | 4 | SWENSE on the moored box | `WaveIsoFoamSWENSE/mooredBox` and `mooredBoxFocusedWave`, `FloatStepperSWENSE/mooredBox` | `waveIsoFoamSWENSE`, `floatStepperSWENSE` |
+
+## Student projects
+
+`Projects/` has 13 projects of 12-16 hours based on the moored box (Day 3) with
+`waveIsoFoamSWENSE` (Day 4). Each has a problem description (PDF) and one setup;
+see [Projects/README.md](Projects/README.md).
 
 ## Requirements
 
 - OpenFOAM v2506 (openfoam.com)
 - FoamWaveTank (waves2Foam, waveIsoFoam, waveIsoFoamSWENSE, MoorDyn
   restraints, FloatStepper), compiled with `./Allwmake`
-- HOS-NWT (https://gitlab.com/lheea/HOS-NWT) on the `PATH` for Day 1
-  `potentialFlowWaves` (needs LAPACK and FFTW at run time)
+- HOS-NWT (https://gitlab.com/lheea/HOS-NWT) on the `PATH` or in `HOSNWT` for Day 1
+  `potentialFlowWaves`, Day 2 and 3 `HOS_FloatStepper` and the Day 4 focused wave (needs LAPACK
+  and FFTW at run time). The coupled cases also need a `setWaveField` that updates Grid2Grid
+  to the start time (`externalWave->step()`).
 - Python 3 with numpy (matplotlib for the plots) for the `Tools/` scripts
 
 - Day 2 and Day 3 `waveIsoFoam` cases: a `waveIsoFoam` build with moving-mesh support.
@@ -42,7 +50,7 @@ motions go to `postProcessing/`.
 Post-processing scripts shared by all days live in `Tools/`.
 
 - `Tools/compareHOS_CFD.py` plots the CFD wave gauges against the HOS-NWT probes
-  of the coupled case (Day 1 `potentialFlowWaves/CFD`). From a CFD case folder:
+  of the coupled cases (Day 1 `potentialFlowWaves/CFD`, Day 2 and 3 `HOS_FloatStepper`). From a CFD case folder:
   `python3 <repo>/Tools/compareHOS_CFD.py`
 - `Tools/makeFocusedWaveHOS.py` writes the HOS-NWT wavemaker files (`.cfg`/`.dat`) for a
   focused wave group (Day 1 `potentialFlowWaves/HOS/FocusingWaves`).
@@ -62,6 +70,7 @@ Post-processing scripts shared by all days live in `Tools/`.
 - Day 2 runs in serial in 10 to 15 minutes per case (`BestSetup` takes hours on many cores).
 - Day 3 runs in serial in 12 (`waveIsoFoam`) and 20 minutes (`FloatStepper`), or 6 and 8
   minutes with `MESH=coarse`.
+- Day 2 and Day 3 `HOS_FloatStepper` run in serial in 12 to 26 minutes including HOS-NWT.
 - Day 4 `WaveIsoFoamSWENSE` runs in serial in 16 minutes (regular), 6 with `MESH=coarse`,
   and 10 minutes for the focused wave (needs HOS-NWT).
   `FloatStepperSWENSE` is work in progress: it stops at about 1.5 s.

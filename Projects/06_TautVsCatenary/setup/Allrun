@@ -1,0 +1,63 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# Project 6 - Taut and catenary mooring
+#   Based on the Day 3 moored box, solved with waveIsoFoamSWENSE (Day 4 set-up).
+#
+#   ./Allclean; ./Allrun
+#   NP=8 ./Allrun       number of cores (default 4; NP=1 is serial)
+#   MESH=coarse ./Allrun   coarse | medium (default) | fine
+#   MOORING=taut ./Allrun  catenary (default) | taut | any Mooring/moorings.<name>
+#
+# Solver: until the moving-body SWENSE is merged to master this uses the
+# development build (as Day 4). Override with
+#   FWT_DYN=/path/to/build ./Allrun      (expects bin/ and lib/)
+#   SOLVER=/path/to/waveIsoFoamSWENSE ./Allrun
+#------------------------------------------------------------------------------
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?Source OpenFOAM-v2506/etc/bashrc first}/bin/tools/RunFunctions
+
+if ls log.* >/dev/null 2>&1; then
+    echo "This case has results: run ./Allclean first, or copy the setup to a new folder"
+    exit 1
+fi
+
+NP=${NP:-4}
+FWT_DYN=${FWT_DYN:-/gpfs/hpc-home/projects/dtu_00075/apps/FoamWaveTank/fwt_rev1_floating/private_e5}
+SOLVER=${SOLVER:-$FWT_DYN/bin/waveIsoFoamSWENSE_dyn}
+[ -x "$SOLVER" ] || command -v "$SOLVER" >/dev/null || { echo "Solver not found: $SOLVER"; exit 1; }
+[ -d "$FWT_DYN/lib" ] && export LD_LIBRARY_PATH="$FWT_DYN/lib:$LD_LIBRARY_PATH"
+
+touch case.foam
+restore0Dir
+MESH=${MESH:-medium}
+[ -f system/meshSize.$MESH ] || { echo "MESH must be coarse, medium or fine"; exit 1; }
+cp system/meshSize.$MESH system/meshSize
+MOORING=${MOORING:-catenary}
+[ -f Mooring/moorings.$MOORING ] || { echo "No Mooring/moorings.$MOORING"; exit 1; }
+cp Mooring/moorings.$MOORING Mooring/lines_v2_bodyC.txt
+
+# 1. Mesh + SWENSE body zone (cells around the body)
+runApplication blockMesh || exit 1
+if [ "$MESH" = medium ]; then
+    cp constant/cellZones.bodyZone constant/polyMesh/cellZones     # zone of the Day 4 case
+else
+    runApplication topoSet -dict system/topoSetDict.bodyZone || exit 1
+fi
+runApplication checkMesh || exit 1
+
+# 2. Run. The solver builds alpha, U and p from the incident wave itself.
+if [ "$NP" -gt 1 ]; then
+    cat > system/decomposeParDict <<EOF
+FoamFile { version 2.0; format ascii; class dictionary; object decomposeParDict; }
+numberOfSubdomains $NP;
+method simple;
+coeffs { n ($NP 1 1); }
+EOF
+    runApplication decomposePar || exit 1
+    runParallel "$SOLVER" || { echo "Solver failed, see log.${SOLVER##*/}"; exit 1; }
+    runApplication reconstructPar -newTimes
+else
+    runApplication "$SOLVER" || { echo "Solver failed, see log.${SOLVER##*/}"; exit 1; }
+fi
+
+#------------------------------------------------------------------------------

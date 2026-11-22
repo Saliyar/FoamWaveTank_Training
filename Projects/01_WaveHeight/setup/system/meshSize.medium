@@ -1,0 +1,14 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      meshSize;
+}
+
+// medium mesh: dx = 0.025 m (L/160), the course mesh
+nxCells     96;
+nxBox       8;
+nz_L1A5     2;
+nz_L2A4     5;
+nz_Box      5;

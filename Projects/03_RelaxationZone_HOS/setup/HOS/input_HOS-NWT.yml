@@ -1,0 +1,52 @@
+# HOS-NWT - incident wave of the project case
+# 20 m tank, 0.5 m deep, wavemaker at x = 0, beach from x = 15 m.
+# The body (CFD x = 0) is at HOS x = 9 m.
+wave tank:
+  dimensions:          # m
+    length: 20.
+    depth: 0.5
+  wavemaker:
+    type: piston
+  numerical absorption beach:
+    position ratio: 0.75   # beach starts at 0.75 * 20 = 15 m
+    absorption coefficient: 1.
+
+computation case:
+  3D: false
+  type: regular
+  # H = 0.1195 m as Day 3 and Day 4 (mean zero-crossing height at the probes,
+  # <repo>/Tools/waveStats.py). The linear amplitude H/2 = 0.05975 m gives H = 0.1245 m
+  # in HOS-NWT (nonlinear wave), so the amplitude is reduced to 0.0576 m.
+  amplitude: 0.0576    # m
+  frequency: 0.501756  # Hz (T = 1.993 s)
+time:
+  duration: 32.0      # s (CFD case: referenceTime + endTime)
+  ramping:
+    order: 2          # smooth start of the wavemaker
+    duration: 3.      # s
+
+numerical parameters:
+  time integration tolerance: 1.e-5
+  discretization:
+    x: 512             # modes along x (dx = 0.039 m)
+    z: 17              # modes on the wavemaker
+  HOS nonlinearity order: 3
+  wavemaker nonlinearity order: 2
+  dealiasing:
+    x: 3
+  filtering coefficients:   # modes above 0.6 * x (wave length < 0.13 m) are set
+    x: 0.6                  # to zero: keeps these steep cases stable
+    z: 1.
+
+output:
+  directory: Results
+  frequency: 20.         # Hz, also the time resolution of the modes file
+  dimensional: true
+  free surface: false
+  modes: false
+  wavemaker motion: true # Results/wmk_motion.dat
+  volumic modal data: standard   # Results/modes_HOS_SWENSE.dat for Grid2Grid
+  HDF5: false
+  probes:
+    type: free surface elevation
+    position file: prob.inp      # x = 7 .. 11 m (CFD gauges x = 3 .. 7 m)

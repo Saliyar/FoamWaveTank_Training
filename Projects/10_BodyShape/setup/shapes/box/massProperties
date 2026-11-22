@@ -1,0 +1,4 @@
+// Box 0.2 x 0.2 x 0.1316 m, draft 0.0786 m
+mass            3.148;
+centreOfMass    (0 0 -0.0126);
+momentOfInertia (0.015 0.0167 0.021);

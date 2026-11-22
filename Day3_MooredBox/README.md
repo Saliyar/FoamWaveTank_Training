@@ -11,7 +11,8 @@ StokesII waves, H = 0.1195 m. Body motion with the OpenFOAM
 | `waveIsoFoam/mooredBox` | `waveIsoFoam` | `sixDoFRigidBodyMotion` + `moorDynR2` restraint | `sixDoFState`, `box_forces` |
 | `FloatStepper/mooredBox` | `floatStepper` | `floaterMeshMotionSolver` (`pisoAddedMass`, update every 4th step) + `moorDynR2` restraint | `floaterMotion` |
 
-Same mesh, box, mooring input and wave in both.
+Same mesh, box, mooring input and wave in both. `HOS_FloatStepper/` (see below) has the same
+box and mooring in HOS-NWT waves.
 
 Output: 10 wave gauges at x = -2 .. 2 (waves2Foam probes in
 `postProcessing/surfaceElevation`, 50 Hz) and the line tensions in `Mooring/`, plus
@@ -30,6 +31,40 @@ The coarse mesh is for a quick look: its pitch amplitude is about 60 % of the me
 `waveIsoFoam` here needs a build with moving-mesh support. `Allrun` defaults to the development
 build on the DTU cluster; elsewhere use `SOLVER=/path/to/waveIsoFoam ./Allrun`
 (or `FWT_PLAIN=/path/to/build`, with `bin/` and `lib/`).
+
+## HOS-NWT + FloatStepper (`HandsonExercise/HOS_FloatStepper`)
+
+The same mesh, box, mooring and numerics as `FloatStepper/mooredBox`, with `floatStepperWaveFoam`
+and the HOS wave in 1 m relaxation zones at both ends and in the initial field.
+
+| Case | Wave | CFD t = 0 is HOS | `endTime` | HOS + CFD, medium | `MESH=coarse` |
+|------|------|-----:|-----:|-----:|-----:|
+| `mooredBox` | Day 1 `potentialFlowWaves/HOS/MooredBoxRegularWaves` | 4 s | 23 s | 24 min | 12 min |
+| `mooredBoxFocusedWave` | as Day 4 `mooredBoxFocusedWave/HOS`, focus at the box at t = 10 s | 15 s | 15 s | 12 min | 7 min |
+
+`./Allrun` runs HOS-NWT first (3-4 min, skipped if `HOS/Results` is complete). It needs LAPACK
+and FFTW at run time (on the DTU cluster: `module load lapack/3.11.0 fftw/3.3.10`);
+`HOSNWT=/path/to/HOS-NWT ./Allrun` to use another build. `./Allclean` also deletes the HOS result.
+
+The coupling is the one of Day 1 `potentialFlowWaves`, with two differences for a floating body:
+
+- `referenceTime` is chosen so that the waves are upstream and the water at the box is almost
+  calm (< 0.6 mm) at CFD t = 0. Day 1 starts inside the developed wave, which would give the
+  box at rest an impulsive start.
+- The box centre is at HOS x = 9 m (`referencePosition`), and both relaxation zones are outside
+  the morphing mesh around the box.
+
+`setWaveField` warns that Tsoft is non-zero and that it starts from still water. Ignore this for
+`externalSource`: the warning is always printed, and the HOS field is set. `Allrun` stops if
+`setWaveField` is a build that does not update Grid2Grid to the start time.
+
+Gauges against HOS, after the run: `python3 ../../../../Tools/compareHOS_CFD.py`
+
+Without the box the wave is within 5 % (RMS/H) of HOS at all gauges (medium mesh). With it, the
+regular-wave amplitudes (t = 13 - 23 s) are 92 % (surge), 93 % (heave) and 89 % (pitch) of
+`FloatStepper/mooredBox`. The waves differ: the HOS piston adds a free second harmonic, so H varies
+along the tank. The box first settles about 5 mm into the mooring, as in `FloatStepper/mooredBox`.
+The table below is for the Stokes II cases: the HOS wave has not been compared with the experiment.
 
 ## How good are the results?
 

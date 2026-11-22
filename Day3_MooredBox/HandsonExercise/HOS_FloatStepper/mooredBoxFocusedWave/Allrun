@@ -1,0 +1,43 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# Day 3b - Moored box in a focused wave, HOS-NWT + FloatStepper
+#   Wave:    JONSWAP group, Tp = 1.2 s, A = 0.06 m, depth 0.5 m, focus at the box at t = 10 s
+#   HOS:     HOS/  (run first if its Results are missing, 3-4 min)
+#   Mapping: constant/waveProperties.input (referencePosition, referenceTime)
+#   Solver:  floatStepperWaveFoam (FloatStepper + waves2Foam relaxation zones)
+#
+# Usage:
+#   ./Allrun               (serial, medium mesh)
+#   MESH=coarse ./Allrun   (serial, quick look)
+#   python3 ../../../../Tools/compareHOS_CFD.py   (after the run: gauges vs HOS)
+#------------------------------------------------------------------------------
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
+
+# 0. HOS-NWT wave field (skipped if HOS/Results is complete)
+./HOS/Allrun || exit 1
+
+touch case.foam
+restore0Dir
+
+# 1. Mesh (as FloatStepper/mooredBox): MESH=coarse | medium (default)
+MESH=${MESH:-medium}
+[ -f "system/meshSize.$MESH" ] || { echo "MESH must be coarse or medium"; exit 1; }
+cp "system/meshSize.$MESH" system/meshSize
+runApplication blockMesh || exit 1
+runApplication checkMesh || exit 1
+
+# 2. Wave set-up and initial field from the HOS solution
+runApplication setWaveParameters || exit 1
+runApplication relaxationZoneLayout || exit 1
+runApplication setWaveField || exit 1
+grep -q "Grid2Grid Time" log.setWaveField || {
+    echo "This setWaveField does not update Grid2Grid to the start time (externalWave->step() missing):"
+    echo "the initial wave field would be wrong. Update and recompile setWaveField."
+    exit 1
+}
+
+# 3. Run (serial)
+runApplication $(getApplication) || { echo "Solver failed, see the log"; exit 1; }
+
+#------------------------------------------------------------------------------

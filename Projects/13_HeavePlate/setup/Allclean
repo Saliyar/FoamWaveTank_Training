@@ -1,0 +1,9 @@
+#!/bin/sh
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?Source OpenFOAM-v2506/etc/bashrc first}/bin/tools/CleanFunctions
+
+cleanCase0
+rm -rf processor* postProcessing log.* case.foam system/decomposeParDict mdv2_body*
+rm -rf Mooring/VTK Mooring/VTP Mooring/Mooring.pvd Mooring/*.out Mooring/*.log
+rm -f system/blockMeshDict constant/massProperties Mooring/lines_v2_bodyC.txt
+#------------------------------------------------------------------------------

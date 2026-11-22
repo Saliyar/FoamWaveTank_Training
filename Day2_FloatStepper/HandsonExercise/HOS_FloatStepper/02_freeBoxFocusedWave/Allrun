@@ -1,0 +1,55 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# Day 2b - Free box in a focused wave, HOS-NWT + FloatStepper
+#   Wave:    JONSWAP group, Tp = 1.2 s, A = 0.06 m, depth 0.4 m, focus at the box at t = 10 s
+#   HOS:     HOS/  (run first if its Results are missing, 3-4 min)
+#   Mapping: constant/waveProperties.input (referencePosition, referenceTime)
+#   Solver:  floatStepperWaveFoam (FloatStepper + waves2Foam relaxation zones)
+#
+# Usage:
+#   ./Allrun        (serial)
+#   python3 ../../../../Tools/compareHOS_CFD.py   (after the run: gauges vs HOS)
+#------------------------------------------------------------------------------
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
+
+# 0. HOS-NWT wave field (skipped if HOS/Results is complete)
+./HOS/Allrun || exit 1
+
+touch case.foam
+restore0Dir
+
+# 1. Mesh: cut out the box, then move it to its initial position x = 2 m
+cp system/controlDict.init system/controlDict
+runApplication blockMesh || exit 1
+runApplication topoSet || exit 1
+runApplication subsetMesh -overwrite c0 -patch box || exit 1
+
+cp constant/dynamicMeshDict constant/dynamicMeshDict.save   # foamDictionary rewrites the file
+foamDictionary constant/dynamicMeshDict -entry onlyMeshMotion -set true -disableFunctionEntries
+runApplication moveDynamicMesh
+status=$?
+mv constant/dynamicMeshDict.save constant/dynamicMeshDict
+[ $status -eq 0 ] && [ -d 0.001 ] || { echo "moveDynamicMesh failed, see its log"; exit 1; }
+
+rm -r 0/uniform 0/polyMesh
+mv 0.001/* 0/
+rm -f 0/uniform/time          # left by moveDynamicMesh (t = 0.001)
+rm -rf 0.001
+runApplication checkMesh || exit 1
+cp system/controlDict.run system/controlDict
+
+# 2. Wave set-up and initial field from the HOS solution
+runApplication setWaveParameters || exit 1
+runApplication relaxationZoneLayout || exit 1
+runApplication setWaveField || exit 1
+grep -q "Grid2Grid Time" log.setWaveField || {
+    echo "This setWaveField does not update Grid2Grid to the start time (externalWave->step() missing):"
+    echo "the initial wave field would be wrong. Update and recompile setWaveField."
+    exit 1
+}
+
+# 3. Run (serial)
+runApplication $(getApplication) || { echo "Solver failed, see the log"; exit 1; }
+
+#------------------------------------------------------------------------------

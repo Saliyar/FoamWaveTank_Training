@@ -1,0 +1,52 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# HOS-NWT potential-flow wave tank (2D, 20 m long, 0.5 m deep)
+#   Input:   input_HOS-NWT.yml, probe positions prob.inp (x in m)
+#   Output:  Results/probes.dat            free-surface elevation at the probes
+#            Results/modes_HOS_SWENSE.dat  modes read by Grid2Grid (CFD case)
+#            Results/wmk_motion.dat        wavemaker motion
+#            Results/vol_energy.dat        volume and energy in time
+#
+# Usage:  ./Allrun   (HOS-NWT on the PATH, or set HOSNWT=/path/to/HOS-NWT)
+#         Does nothing if a complete result is already in Results/.
+#------------------------------------------------------------------------------
+cd "${0%/*}" || exit 1
+
+# HOS-NWT can stop early ("minimum time step reached") with exit code 0:
+# a result is complete when it reaches the duration in the input file
+complete()
+{
+    tEnd=$(awk '/^time:/{t=1} t && /duration:/{print $2; exit}' input_HOS-NWT.yml)
+    tLast=$(tail -1 Results/vol_energy.dat 2>/dev/null | awk '{print $1+0}')
+    [ -f Results/modes_HOS_SWENSE.dat ] && \
+        awk -v a="${tLast:-0}" -v b="$tEnd" 'BEGIN{exit !(a >= b - 0.1)}'
+}
+
+if [ -d Results ]; then
+    if complete; then
+        echo "$PWD: complete HOS-NWT result in Results/ (./Allclean to run again)"
+        exit 0
+    fi
+    echo "$PWD: Results/ reaches t = ${tLast:-0} s of $tEnd s: run ./Allclean, check input_HOS-NWT.yml"
+    exit 1
+fi
+
+HOSNWT=${HOSNWT:-$(command -v HOS-NWT)}
+HOSNWT=${HOSNWT:-/gpfs/hpc-home/projects/dtu_00075/apps/HOS-NWT/install/bin/HOS-NWT}
+if [ -z "$HOSNWT" ] || [ ! -x "$HOSNWT" ]; then
+    echo "HOS-NWT not found. Put it on the PATH or run:  HOSNWT=/path/to/HOS-NWT ./Allrun"
+    echo "(https://gitlab.com/lheea/HOS-NWT)"
+    exit 1
+fi
+
+echo "Running $HOSNWT input_HOS-NWT.yml > log.HOS-NWT"
+"$HOSNWT" input_HOS-NWT.yml > log.HOS-NWT 2>&1
+status=$?
+if [ $status -ne 0 ] || ! complete; then
+    echo "HOS-NWT failed: reached t = ${tLast:-0} s of $tEnd s (exit $status), see log.HOS-NWT"
+    tail -3 log.HOS-NWT
+    exit 1
+fi
+echo "Done: Results/probes.dat, Results/modes_HOS_SWENSE.dat"
+
+#------------------------------------------------------------------------------
