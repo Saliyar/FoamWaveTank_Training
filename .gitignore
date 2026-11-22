@@ -29,3 +29,4 @@ __pycache__/
 /**/HandsonExercise/**/VTKGrid2Grid/
 /**/HandsonExercise/**/VTK\\Grid2Gridsurf2volMesh.vtk
 /**/HandsonExercise/**/compareHOS_CFD.png
+/**/HandsonExercise/**/system/meshSize

@@ -1,0 +1,30 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# Day 3 - Moored box in regular waves, FloatStepper
+#   floaterMeshMotionSolver (FloatStepper, pisoAddedMass) + MoorDyn v2 (4 lines, BODY coupling)
+#   StokesII incident wave (waveModels at the inlet patch), H = 0.1195 m
+#
+# Usage:  ./Allrun                     (serial, about 20 min)
+#         MESH=coarse ./Allrun         (serial, about 8 min, quick look)
+#------------------------------------------------------------------------------
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
+
+touch case.foam
+restore0Dir
+
+# 1. Mesh: MESH=coarse | medium (default)
+MESH=${MESH:-medium}
+[ -f system/meshSize.$MESH ] || { echo "MESH must be coarse or medium"; exit 1; }
+cp system/meshSize.$MESH system/meshSize
+runApplication blockMesh
+runApplication checkMesh
+
+# 2. Initial free surface (still water, z < 0)
+runApplication setFields
+
+# 3. Run (serial). Wave gauges and the box state are written by
+#    the function objects in system/controlDict -> postProcessing/
+runApplication $(getApplication)   # floatStepper
+
+#------------------------------------------------------------------------------

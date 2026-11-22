@@ -1,0 +1,30 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2506                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+FoamFile
+{
+    version         2;
+    format          ascii;
+    class           dictionary;
+    location        "constant";
+    object          dynamicMeshDict;
+}
+
+// Day 2 with waveIsoFoam: the box is moved by the OpenFOAM 6-DoF model
+// (0.orig/pointDisplacement, patch box). The mesh follows by Laplacian smoothing,
+// so the points can slide along the bed and the top of the tank.
+dynamicFvMesh       dynamicMotionSolverFvMesh;
+motionSolverLibs    (fvMotionSolvers sixDoFRigidBodyMotion);
+motionSolver        displacementLaplacian;
+
+displacementLaplacianCoeffs
+{
+    diffusivity     quadratic inverseDistance (box);
+}
+
+// ************************************************************************* //

@@ -1,0 +1,53 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | www.openfoam.com
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      dynamicMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Day 3 with FloatStepper: the box is moved by floaterMeshMotionSolver (added-mass
+// model pisoAddedMass), the mooring by the same MoorDyn v2 input as the waveIsoFoam case.
+dynamicFvMesh   dynamicPointDisplacementFvMesh;
+
+solvers
+{
+    box
+    {
+        motionSolverLibs ( floaterMotion );
+        motionSolver    floaterMeshMotionSolver;
+        floaterMeshMotionSolverCoeffs
+        {
+            patches         (box);
+            innerDistance   0.075;
+            outerDistance   0.4;
+            linDirs         (1 0 1);
+            rotDirs         (0 1 0);
+            addedMassModel  pisoAddedMass;
+            MaddUpdateFreq  4;      // added mass every 4th step (every step is slower)
+            restraints
+            {
+                moorDynR2_body
+                {
+                    floaterMotionRestraint  moorDynR2;
+                    couplingMode        "BODY";
+                    inputFile           "Mooring/lines_v2_bodyC.txt";
+                    vtkPrefix           "mdv2_body";
+                    writeMooringVTK     true;
+                    vtkStartTime        0;
+                    outerCorrector      1;
+                }
+            }
+        }
+    }
+}
+
+// ************************************************************************* //

@@ -1,0 +1,49 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# Day 2b - waveIsoFoam: freely floating box hit by a focused wave
+#   Same tank, box and mesh as Day 2a (tank extended upstream to x = -2 m
+#   for the waves2Foam inlet relaxation zone).
+#   Solver: waveIsoFoam with sixDoFRigidBodyMotion (compare FloatStepper/)
+#   Wave:   NewWave (JONSWAP, Tp = 1.2 s, etaMax = 0.06 m) focused on the
+#           box centre x = 2 m at t = 10 s  -> constant/waveProperties.input
+#
+# Usage:  ./Allrun                (serial, about 11 min)
+#         NPROCS=4 ./Allrun       (parallel, if you change to a finer mesh)
+#------------------------------------------------------------------------------
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
+
+# waveIsoFoam build with moving-mesh support (as Day 3); override with SOLVER=/path/waveIsoFoam
+FWT_PLAIN=${FWT_PLAIN:-/gpfs/hpc-home/projects/dtu_00075/apps/FoamWaveTank/fwt_rev1_floating/private}
+SOLVER=${SOLVER:-$FWT_PLAIN/bin/waveIsoFoam}
+[ -d "$FWT_PLAIN/lib" ] && export LD_LIBRARY_PATH="$FWT_PLAIN/lib:$LD_LIBRARY_PATH"
+
+touch case.foam
+restore0Dir
+
+# 1. Mesh: graded background mesh (finer around the free surface and box),
+#    cut the box out (centre x = 2 m, z = 0.3 .. 0.5 m)
+runApplication blockMesh
+runApplication topoSet
+runApplication subsetMesh -overwrite c0 -patch box
+runApplication checkMesh
+
+# 2. Wave parameters, relaxation zone layout, initial still-water surface z = 0.4
+runApplication setWaveParameters
+runApplication relaxationZoneLayout
+runApplication setAlphaField
+
+# 3. Run. NPROCS cores (default 1: serial)
+NPROCS=${NPROCS:-1}
+if [ "$NPROCS" -gt 1 ]; then
+    # some MPI modules set this with literal quotes, which Open MPI rejects
+    case "${OMPI_MCA_pml:-}" in *\"*|*\'*) unset OMPI_MCA_pml ;; esac
+    sed "s/^numberOfSubdomains.*/numberOfSubdomains $NPROCS;/" system/decomposeParDict > system/decomposeParDict.run
+    runApplication decomposePar -force -decomposeParDict system/decomposeParDict.run || exit 1
+    runParallel -decomposeParDict system/decomposeParDict.run $SOLVER || { echo "Solver failed, see the log"; exit 1; }
+    runApplication reconstructPar -newTimes
+else
+    runApplication $SOLVER || { echo "Solver failed, see the log"; exit 1; }
+fi
+
+#------------------------------------------------------------------------------

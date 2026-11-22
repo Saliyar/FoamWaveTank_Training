@@ -1,0 +1,65 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# Day 2b - Freely floating box hit by a focused wave
+#   Same tank, box and mesh as Day 2a (tank extended upstream to x = -2 m
+#   for the waves2Foam inlet relaxation zone).
+#   Solver: floatStepperWaveFoam (FloatStepper + waves2Foam relaxation zones)
+#   Wave:   NewWave (JONSWAP, Tp = 1.2 s, etaMax = 0.06 m) focused on the
+#           box centre x = 2 m at t = 10 s  -> constant/waveProperties.input
+#
+# BEST SETUP: the FloatStepper tutorial mesh and settings, unchanged (full mesh,
+#         added mass every step). Slow: use several cores.
+# Usage:  ./Allrun                (serial)
+#         NPROCS=8 ./Allrun       (parallel on 8 cores)
+#------------------------------------------------------------------------------
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
+
+touch case.foam
+restore0Dir
+
+# 1. Mesh: background mesh, one refinement band around the free surface,
+#    cut out the box, then move the box to its initial position
+cp system/controlDict.init system/controlDict
+runApplication blockMesh
+
+runApplication -s 1 topoSet -dict system/topoSetDict1
+runApplication -s 1 refineMesh -dict system/refineMeshDict1 -overwrite
+
+# Finer meshes (as in the paper): uncomment
+#runApplication -s 2 topoSet -dict system/topoSetDict2
+#runApplication -s 2 refineMesh -dict system/refineMeshDict2 -overwrite
+#runApplication -s 3 topoSet -dict system/topoSetDict3
+#runApplication -s 3 refineMesh -dict system/refineMeshDict3 -overwrite
+
+runApplication topoSet
+runApplication subsetMesh -overwrite c0 -patch box
+
+foamDictionary constant/dynamicMeshDict -entry onlyMeshMotion -set true -disableFunctionEntries
+runApplication moveDynamicMesh
+foamDictionary constant/dynamicMeshDict -entry onlyMeshMotion -remove -disableFunctionEntries
+
+rm -r 0/uniform 0/polyMesh
+mv 0.001/* 0/
+rm -rf 0.001
+runApplication checkMesh
+
+# 2. Wave parameters (waveProperties.input -> waveProperties), relaxation
+#    zone layout (field for ParaView) and initial still-water surface z = 0.4
+runApplication setWaveParameters
+runApplication relaxationZoneLayout
+runApplication setAlphaField
+
+# 3. Run (serial). Wave gauges (interfaceHeight1, incl. x = -1 and the focus
+#    point x = 2), floater state and added
+#    mass are written by the function objects -> postProcessing/
+cp system/controlDict.run system/controlDict
+if [ "${NPROCS:-1}" -gt 1 ]; then
+    foamDictionary -entry numberOfSubdomains -set "$NPROCS" system/decomposeParDict
+    runApplication decomposePar -force
+    runParallel $(getApplication)
+else
+    runApplication $(getApplication)
+fi
+
+#------------------------------------------------------------------------------

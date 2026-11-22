@@ -10,7 +10,7 @@ time window [t0, t1] (default: the second half of each record). Use it to
 check that the same wave reaches the box in Day 1, 2, 3 and 4, e.g.
 
     python3 Tools/waveStats.py Day1_Waves/HandsonExercise/06_mooredBoxRegularWaves \\
-                               Day3_MooredBox/HandsonExercise/mooredBox_waveIsoFoam --start 10
+                               Day3_MooredBox/HandsonExercise/waveIsoFoam/mooredBox --start 10
 
 It reads, whichever the case has:
   OpenFOAM interfaceHeight   postProcessing/<name>/<t>/position.dat

@@ -1,0 +1,73 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2206                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    arch        "LSB;label=32;scalar=64";
+    class       dictionary;
+    location    "constant";
+    object      waveProperties.input;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Still water level z = 0, depth 0.5 m.
+// setWaveParameters turns this file into constant/waveProperties.
+
+seaLevel            0.0;
+
+relaxationNames     (inlet outlet);
+
+initializationName  inlet;
+
+inletCoeffs
+{
+    // Regular second-order Stokes wave: H = 0.08 m, T = 1.5 s
+    // (wave length about 3.1 m, kh about 1.0, H/L about 0.026)
+    waveType    stokesSecond;
+    height      0.08;
+    period      1.5;
+    depth       0.5;
+    direction   (1 0 0);
+    phi         0.0;
+    debug       off;
+    Tsoft       3;     // ramp-up time [s]
+
+    relaxationZone
+    {
+        relaxationScheme Spatial;
+        relaxationShape  Rectangular;
+        beachType        Empty;
+
+        relaxType   INLET;
+        startX      (0 0 -1);
+        endX        (3 0  1);
+        orientation (1 0 0);
+    }
+};
+
+outletCoeffs
+{
+    waveType    potentialCurrent;
+    U           (0 0 0);
+    Tsoft       2;
+
+    relaxationZone
+    {
+        relaxationScheme Spatial;
+        relaxationShape  Rectangular;
+        beachType        Empty;
+
+        relaxType   OUTLET;
+        startX      (12 0 -1);
+        endX        (18 0  1);
+        orientation (1 0 0);
+    }
+};
+
+// ************************************************************************* //

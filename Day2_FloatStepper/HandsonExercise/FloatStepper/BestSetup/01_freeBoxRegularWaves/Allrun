@@ -1,0 +1,60 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# Day 2a - Freely floating box in regular waves (Ren et al. 2015 benchmark)
+#   Solver: floatStepper (FloatStepper, Roenby et al. 2024, RSOS)
+#   Waves:  OpenFOAM waveModels, StokesV, H = 0.1 m, T = 1.2 s, depth 0.4 m
+#   Box:    0.3 m x 0.2 m, 12 kg, surge/heave/pitch free
+#
+# BEST SETUP: the FloatStepper tutorial mesh and settings, unchanged (full mesh,
+#         added mass every step). Slow: use several cores.
+# Usage:  ./Allrun                (serial)
+#         NPROCS=8 ./Allrun       (parallel on 8 cores)
+#         python3 compareExpNum.py (after the run: motions vs experiment)
+#------------------------------------------------------------------------------
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
+
+touch case.foam
+restore0Dir
+
+# 1. Mesh: background mesh, one refinement band around the free surface,
+#    cut out the box, then move the box to its initial position
+cp system/controlDict.init system/controlDict
+runApplication blockMesh
+
+runApplication -s 1 topoSet -dict system/topoSetDict1
+runApplication -s 1 refineMesh -dict system/refineMeshDict1 -overwrite
+
+# Finer meshes (as in the paper): uncomment
+#runApplication -s 2 topoSet -dict system/topoSetDict2
+#runApplication -s 2 refineMesh -dict system/refineMeshDict2 -overwrite
+#runApplication -s 3 topoSet -dict system/topoSetDict3
+#runApplication -s 3 refineMesh -dict system/refineMeshDict3 -overwrite
+
+runApplication topoSet
+runApplication subsetMesh -overwrite c0 -patch box
+
+foamDictionary constant/dynamicMeshDict -entry onlyMeshMotion -set true -disableFunctionEntries
+runApplication moveDynamicMesh
+foamDictionary constant/dynamicMeshDict -entry onlyMeshMotion -remove -disableFunctionEntries
+
+rm -r 0/uniform 0/polyMesh
+mv 0.001/* 0/
+rm -rf 0.001
+runApplication checkMesh
+
+# 2. Initial free surface (still water, z = 0.4 m)
+runApplication setAlphaField
+
+# 3. Run (serial). Wave gauges (interfaceHeight1), floater state and added
+#    mass are written by the function objects -> postProcessing/
+cp system/controlDict.run system/controlDict
+if [ "${NPROCS:-1}" -gt 1 ]; then
+    foamDictionary -entry numberOfSubdomains -set "$NPROCS" system/decomposeParDict
+    runApplication decomposePar -force
+    runParallel $(getApplication)
+else
+    runApplication $(getApplication)
+fi
+
+#------------------------------------------------------------------------------

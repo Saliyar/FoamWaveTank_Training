@@ -1,0 +1,31 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# Day 1 - 2D numerical wave flume with waveFoam (MULES + waves2Foam)
+#   Wave input: constant/waveProperties.input
+#   Gauges:     constant/probeDefinitions  (x = 2, 4, 6, 8, 10, 12 m)
+#   Output:     postProcessing/surfaceElevation/<t>/surfaceElevation.dat
+#
+# Usage:  ./Allrun        (serial, local machine)
+#------------------------------------------------------------------------------
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
+
+touch case.foam
+restore0Dir
+
+# 1. Mesh
+runApplication blockMesh
+runApplication checkMesh
+
+# 2. Wave set-up
+runApplication setWaveParameters       # waveProperties.input -> waveProperties
+runApplication relaxationZoneLayout    # writes the relaxation weight field
+runApplication setWaveField            # alpha, U (and p) of the wave at t = 0
+
+# 3. Wave gauges (function object included by system/controlDict)
+runApplication waveGaugesNProbes
+
+# 4. Run (serial)
+runApplication $(getApplication)
+
+#------------------------------------------------------------------------------

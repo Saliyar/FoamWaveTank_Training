@@ -1,0 +1,14 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      meshSize;
+}
+
+// fine mesh: dx = 0.0125 m (L/320)
+nxCells     192;
+nxBox       16;
+nz_L1A5     4;
+nz_L2A4     10;
+nz_Box      10;

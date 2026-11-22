@@ -1,0 +1,116 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.3                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+    location        "system";
+    class           dictionary;
+    object          controlDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     waveIsoFoam;
+
+startFrom       latestTime;
+
+startTime       0.0;
+
+stopAt          endTime;
+
+endTime         20;
+
+deltaT          0.001;
+
+writeControl    adjustable;
+
+writeInterval   0.1;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression on;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+adjustTimeStep  yes;
+
+maxCo           0.5;
+maxAlphaCo	    0.5;
+
+maxDeltaT       1;
+
+// ************************************************************************* //
+libs            ( "libwaves2Foam.so" waveModels );
+
+functions
+{
+
+
+    surfaceElevation
+    {
+        type            surfaceElevation;
+        libs            ( "libwaves2Foam.so" "libwaves2FoamSampling.so" );
+        writeControl    runTime;
+        writeInterval   0.02;
+        setFormat       raw;
+        interpolationScheme cellPointFace;
+        fields          (alpha.water);
+        sets
+        (
+            gauge_0
+            {
+                type    face;
+                axis    z;
+                start   (0.0001 0.0001 0.001);
+                end     (0.0001 0.0001 0.799);
+                nPoints 100;
+            }
+            gauge_1
+            {
+                type    face;
+                axis    z;
+                start   (1.0001 0.0001 0.001);
+                end     (1.0001 0.0001 0.799);
+                nPoints 100;
+            }
+            gauge_2
+            {
+                type    face;
+                axis    z;
+                start   (3.0001 0.0001 0.001);
+                end     (3.0001 0.0001 0.799);
+                nPoints 100;
+            }
+            gauge_3
+            {
+                type    face;
+                axis    z;
+                start   (4.0001 0.0001 0.001);
+                end     (4.0001 0.0001 0.799);
+                nPoints 100;
+            }
+            gauge_4
+            {
+                type    face;
+                axis    z;
+                start   (4.9999 0.0001 0.001);
+                end     (4.9999 0.0001 0.799);
+                nPoints 100;
+            }
+        );
+    }
+}

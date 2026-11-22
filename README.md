@@ -6,9 +6,9 @@ serial run) and an `Allclean` (resets the case to the state in git).
 
 | Day | Topic | Exercises (`DayN_*/HandsonExercise/`) | Solver |
 |-----|-------|----------------------------------------|--------|
-| 1 | Waves | `01_regularWaves`, `02_irregularWaves`, `03_focusedWave` | `waveIsoFoam` |
-| 2 | Floating bodies with FloatStepper | `01_freeBoxRegularWaves`, `02_freeBoxFocusedWave` | `floatStepper`, `floatStepperWaveFoam` |
-| 3 | Moored floating box | `mooredBox_waveIsoFoam` | `waveIsoFoam` + sixDoF + MoorDyn |
+| 1 | Waves | `waveFoam/` and `waveIsoFoam/`, each with `01_regularWaves`, `02_irregularWaves`, `03_focusedWave`; `potentialFlowWaves/` | `waveFoam`, `waveIsoFoam`, HOS-NWT + Grid2Grid |
+| 2 | Free floating box | `waveIsoFoam/` and `FloatStepper/`, each with `01_freeBoxRegularWaves`, `02_freeBoxFocusedWave` | `waveIsoFoam` + sixDoF; `floatStepper`, `floatStepperWaveFoam` |
+| 3 | Moored floating box | `waveIsoFoam/mooredBox`, `FloatStepper/mooredBox` | `waveIsoFoam` + sixDoF + MoorDyn; `floatStepper` + MoorDyn |
 | 4 | SWENSE on the moored box | `01_mooredBox_waveIsoFoamSWENSE`, `02_mooredBox_floatStepperSWENSE` | `waveIsoFoamSWENSE`, `floatStepperSWENSE` |
 
 ## Requirements
@@ -20,11 +20,15 @@ serial run) and an `Allclean` (resets the case to the state in git).
   `potentialFlowWaves` (needs LAPACK and FFTW at run time)
 - Python 3 with numpy (matplotlib for the plots) for the `Tools/` scripts
 
+- Day 2 and Day 3 `waveIsoFoam` cases: a `waveIsoFoam` build with moving-mesh support.
+  `Allrun` defaults to a development build on the DTU cluster; elsewhere set
+  `SOLVER=/path/to/waveIsoFoam`.
+
 ## Running an exercise
 
 ```sh
 source <OpenFOAM-v2506>/etc/bashrc
-cd Day1_Waves/HandsonExercise/01_regularWaves
+cd Day1_Waves/HandsonExercise/waveFoam/01_regularWaves
 ./Allrun          # serial
 paraview case.foam
 ./Allclean        # back to the clean case
@@ -44,7 +48,8 @@ Post-processing scripts shared by all days live in `Tools/`.
   focused wave group (Day 1 `potentialFlowWaves/HOS/FocusingWaves`).
 - `Tools/mooringToParaview.py` turns the MoorDyn line output (`Mooring/*_Line<N>.out`)
   into a ParaView time series `Mooring/Mooring.pvd` with segment tensions (Day 3, Day 4).
-  From a case folder: `python3 ../../../Tools/mooringToParaview.py` (one frame per saved time folder)
+  From a case folder: `python3 ../../../../Tools/mooringToParaview.py` in Day 3,
+  `python3 ../../../Tools/mooringToParaview.py` in Day 4 (one frame per saved time folder)
 - `Tools/waveStats.py` prints the mean wave height, crest, trough and period at every
   wave gauge of one or more cases (OpenFOAM `interfaceHeight`, waves2Foam gauges or
   HOS-NWT probes), e.g. to check that Day 1 to Day 4 have the same incident wave:
@@ -52,10 +57,13 @@ Post-processing scripts shared by all days live in `Tools/`.
 
 ## Status (Nov 2026)
 
-- Day 1 runs in serial in 5 to 10 minutes (regular 5.0, irregular 10.3,
-  focused 5.3 min on one DTU HPC core).
-- Days 2 to 4 are set up with their full physical times (20 s, 15 s, 23 s);
-  they take about one hour or more in serial and will be shortened before
-  the course.
+- Day 1 `waveFoam/` and `waveIsoFoam/` run in serial in 7 to 16 minutes (regular 7-8,
+  irregular 15, focused 8-9 min on one core of a shared DTU HPC node).
+- Day 1 empty-tank cases `04` and `05` take about 1 minute each, `06` about 10 minutes.
+- Day 2 runs in serial in 10 to 15 minutes per case (`BestSetup` takes hours on many cores).
+- Day 3 runs in serial in 12 (`waveIsoFoam`) and 20 minutes (`FloatStepper`), or 6 and 8
+  minutes with `MESH=coarse`.
+- Day 4 is not updated yet: `waveIsoFoamSWENSE` takes about 70 minutes in serial and
+  `floatStepperSWENSE` is work in progress (it stops at about 1.5 s).
 - Day 4 runs the moving-body SWENSE solvers from development builds (see the
   `Allrun` of each case); they will be in FoamWaveTank master before the course.

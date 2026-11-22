@@ -1,0 +1,58 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# Day 2b - Freely floating box hit by a focused wave
+#   Same tank, box and mesh as Day 2a (tank extended upstream to x = -2 m
+#   for the waves2Foam inlet relaxation zone).
+#   Solver: floatStepperWaveFoam (FloatStepper + waves2Foam relaxation zones)
+#   Wave:   NewWave (JONSWAP, Tp = 1.2 s, etaMax = 0.06 m) focused on the
+#           box centre x = 2 m at t = 10 s  -> constant/waveProperties.input
+#
+# Usage:  ./Allrun                (serial, about 15 min)
+#         NPROCS=4 ./Allrun       (parallel, if you change to a finer mesh)
+#------------------------------------------------------------------------------
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
+
+touch case.foam
+restore0Dir
+
+# 1. Mesh: graded background mesh (finer around the free surface and box),
+#    cut out the box, then move the box to its initial position
+cp system/controlDict.init system/controlDict
+runApplication blockMesh
+
+
+runApplication topoSet
+runApplication subsetMesh -overwrite c0 -patch box
+
+cp constant/dynamicMeshDict constant/dynamicMeshDict.save   # foamDictionary rewrites the file
+foamDictionary constant/dynamicMeshDict -entry onlyMeshMotion -set true -disableFunctionEntries
+runApplication moveDynamicMesh
+mv constant/dynamicMeshDict.save constant/dynamicMeshDict
+
+rm -r 0/uniform 0/polyMesh
+mv 0.001/* 0/
+rm -rf 0.001
+runApplication checkMesh
+
+# 2. Wave parameters (waveProperties.input -> waveProperties), relaxation
+#    zone layout (field for ParaView) and initial still-water surface z = 0.4
+runApplication setWaveParameters
+runApplication relaxationZoneLayout
+runApplication setAlphaField
+
+# 3. Run. NPROCS cores (default 1: serial)
+cp system/controlDict.run system/controlDict
+NPROCS=${NPROCS:-1}
+if [ "$NPROCS" -gt 1 ]; then
+    # some MPI modules set this with literal quotes, which Open MPI rejects
+    case "${OMPI_MCA_pml:-}" in *\"*|*\'*) unset OMPI_MCA_pml ;; esac
+    sed "s/^numberOfSubdomains.*/numberOfSubdomains $NPROCS;/" system/decomposeParDict > system/decomposeParDict.run
+    runApplication decomposePar -force -decomposeParDict system/decomposeParDict.run || exit 1
+    runParallel -decomposeParDict system/decomposeParDict.run $(getApplication) || { echo "Solver failed, see the log"; exit 1; }
+    runApplication reconstructPar -newTimes
+else
+    runApplication $(getApplication) || { echo "Solver failed, see the log"; exit 1; }
+fi
+
+#------------------------------------------------------------------------------

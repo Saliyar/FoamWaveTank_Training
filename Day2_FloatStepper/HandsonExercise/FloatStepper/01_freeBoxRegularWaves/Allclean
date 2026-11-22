@@ -1,0 +1,10 @@
+#!/bin/sh
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?}/bin/tools/CleanFunctions
+
+cleanCase0
+rm -rf processor* system/decomposeParDict.run
+cp system/controlDict.run system/controlDict
+rm -rf trajectory case.foam
+
+#------------------------------------------------------------------------------

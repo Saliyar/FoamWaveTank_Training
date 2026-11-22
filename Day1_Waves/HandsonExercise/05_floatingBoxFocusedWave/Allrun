@@ -8,7 +8,7 @@
 #   Solver: waveIsoFoam (the VOF + waves2Foam part of floatStepperWaveFoam)
 #
 # Usage:  ./Allrun
-#   Wave gauges -> postProcessing/interfaceHeight1 (x = -1, 2, 1, 3, 4, 5 m)
+#   Wave gauges -> postProcessing/surfaceElevation (x = -1, 2, 1, 3, 4, 5 m)
 #------------------------------------------------------------------------------
 cd "${0%/*}" || exit 1
 . ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
@@ -16,18 +16,8 @@ cd "${0%/*}" || exit 1
 touch case.foam
 restore0Dir
 
-# 1. Mesh: background mesh and one refinement band around the free surface
-#    (Day 2 then cuts the box out of this mesh)
+# 1. Mesh: the graded Day 2 mesh (Day 2 then cuts the box out of it)
 runApplication blockMesh
-runApplication -s 1 topoSet -dict system/topoSetDict1
-runApplication -s 1 refineMesh -dict system/refineMeshDict1 -overwrite
-
-# Finer meshes (as in the paper): uncomment
-#runApplication -s 2 topoSet -dict system/topoSetDict2
-#runApplication -s 2 refineMesh -dict system/refineMeshDict2 -overwrite
-#runApplication -s 3 topoSet -dict system/topoSetDict3
-#runApplication -s 3 refineMesh -dict system/refineMeshDict3 -overwrite
-
 runApplication checkMesh
 
 # 2. Wave parameters (waveProperties.input -> waveProperties), relaxation

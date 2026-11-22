@@ -1,0 +1,86 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2206                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    arch        "LSB;label=32;scalar=64";
+    class       dictionary;
+    location    "constant";
+    object      waveProperties.input;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Still water level z = 0, depth 0.5 m.
+// setWaveParameters turns this file into constant/waveProperties.
+
+seaLevel            0.0;
+
+relaxationNames     (inlet outlet);
+
+initializationName  inlet;
+
+inletCoeffs
+{
+    // Focused wave group (NewWave, JONSWAP-shaped amplitude spectrum):
+    // linear crest etaMax = 0.06 m at x = focusPoint, t = focusTime
+    waveType    irregular;
+    spectrum    newWaveJONSWAP;
+    etaMax      0.06;
+    Tp          1.5;
+    gamma       3.3;
+    depth       0.5;
+    direction   (1 0 0);
+    N           50;
+    Tsoft       1;
+
+    phaseMethod focusingPhase;
+    focusTime   15.0;
+    focusPoint  (8.0 0 0);     // gauge 4
+
+    frequencyAxis
+    {
+        discretisation       equidistantFrequencyAxis;
+        lowerFrequencyCutoff 0.3;
+        upperFrequencyCutoff 1.6;
+        writeSpectrum        false;
+    }
+
+    relaxationZone
+    {
+        relaxationScheme Spatial;
+        relaxationShape  Rectangular;
+        beachType        Empty;
+
+        relaxType   INLET;
+        startX      (0 0 -1);
+        endX        (3 0  1);
+        orientation (1 0 0);
+    }
+};
+
+outletCoeffs
+{
+    waveType    potentialCurrent;
+    U           (0 0 0);
+    Tsoft       2;
+
+    relaxationZone
+    {
+        relaxationScheme Spatial;
+        relaxationShape  Rectangular;
+        beachType        Empty;
+
+        relaxType   OUTLET;
+        startX      (12 0 -1);
+        endX        (18 0  1);
+        orientation (1 0 0);
+    }
+};
+
+// ************************************************************************* //

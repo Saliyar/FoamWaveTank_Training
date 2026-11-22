@@ -1,0 +1,48 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.1.1                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       pointVectorField;
+    location    "0.01";
+    object      pointDisplacement;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 0 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    inlet       { type fixedValue; value uniform (0 0 0); }
+    outlet      { type fixedValue; value uniform (0 0 0); }
+    bottom      { type slip; }
+    atmosphere  { type slip; }
+    sidewalls   { type empty; }
+    box
+    {
+        type            sixDoFRigidBodyDisplacement;
+        mass            12;
+        centreOfMass    (2 0 0.4);
+        momentOfInertia (1 0.15106368 1);
+        accelerationRelaxation 0.4;
+        report          on;
+        rho             rho;
+        solver          { type Newmark; }
+        constraints
+        {
+            xzPlane { sixDoFRigidBodyMotionConstraint plane; normal (0 1 0); }
+            yAxis   { sixDoFRigidBodyMotionConstraint axis;  axis   (0 1 0); }
+        }
+        value           uniform (0 0 0);
+    }
+}
+
+// ************************************************************************* //

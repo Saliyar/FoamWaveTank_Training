@@ -1,7 +1,7 @@
 #!/bin/sh
 #------------------------------------------------------------------------------
 # Day 1 - 06  The Day 3 / Day 4 regular wave in the empty tank (no box)
-#   Same tank, mesh and wave as Day3_MooredBox/mooredBox_waveIsoFoam and the
+#   Same tank, mesh and wave as Day3_MooredBox waveIsoFoam/mooredBox and the
 #   Day 4 SWENSE cases: depth 0.5 m, x = -2.5 .. 2.5 m, box position x = 0
 #   (the hole for the box in the Day 3 mesh is filled with one block).
 #   Wave:   OpenFOAM waveModels, StokesII, H = 0.1195 m, T = 1.993 s,
