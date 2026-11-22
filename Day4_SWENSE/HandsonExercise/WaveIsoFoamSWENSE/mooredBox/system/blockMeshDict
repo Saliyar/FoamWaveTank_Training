@@ -25,11 +25,7 @@ FoamFile
 
 scale 1;
 
-nxCells     96;
-nxBox       8;
-nz_L1A5     2;
-nz_L2A4     5;
-nz_Box      5;
+#include "meshSize"   // cell numbers: system/meshSize.<coarse|medium|fine>, chosen by MESH=... ./Allrun
 
 vertices
 (

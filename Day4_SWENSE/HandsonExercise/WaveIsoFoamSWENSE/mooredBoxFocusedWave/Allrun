@@ -1,0 +1,51 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# Day 4a - Moored box in a focused wave, waveIsoFoamSWENSE (Rev1, moving body)
+#   Day 2 focused group (A 0.06 m, Tp 1.2 s, gamma 3.3, f 0.4-1.4 Hz) in 0.5 m depth,
+#   focus at the box at t = 10 s. Incident wave from HOS-NWT (HOS/) through Grid2Grid.
+#   HOS-NWT needs LAPACK and FFTW at run time; HOSNWT=/path/to/HOS-NWT to override.
+#   bodyZone = cells around the box where the complementary flow is solved
+#   (cut 5 cell rows below the atmosphere, z < 0.1118).
+#   Adaptive dt (maxCo 0.5), level correction OFF (set-up of run E/S3).
+#
+# Solver: until the moving-body SWENSE is merged to master this case runs the
+# private build of commit 30df70a. Override with
+#         FWT_DYN=/path/to/build ./Allrun     (expects bin/ and lib/)
+#         SOLVER=/path/to/waveIsoFoamSWENSE ./Allrun
+#------------------------------------------------------------------------------
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
+
+FWT_DYN=${FWT_DYN:-/gpfs/hpc-home/projects/dtu_00075/apps/FoamWaveTank/fwt_rev1_floating/private_e5}
+SOLVER=${SOLVER:-$FWT_DYN/bin/waveIsoFoamSWENSE_dyn}
+[ -d "$FWT_DYN/lib" ] && export LD_LIBRARY_PATH="$FWT_DYN/lib:$LD_LIBRARY_PATH"
+
+# 0. Incident wave (skipped if HOS/Results is complete)
+./HOS/Allrun || exit 1
+
+touch case.foam
+restore0Dir
+
+# 1. Mesh (identical to Day 3) + the SWENSE body zone
+# Mesh size: MESH=coarse | medium (default) | fine, e.g.  MESH=coarse ./Allrun
+MESH=${MESH:-medium}
+[ -f system/meshSize.$MESH ] || { echo "MESH must be coarse, medium or fine"; exit 1; }
+cp system/meshSize.$MESH system/meshSize
+
+runApplication blockMesh
+if [ "$MESH" = medium ]; then
+    cp constant/cellZones.bodyZone constant/polyMesh/cellZones
+else
+    runApplication topoSet -dict system/topoSetDict.bodyZone   # the same region: |x| < 0.5 m, z < 0.1118 m
+fi
+runApplication checkMesh
+
+# 2. Initial fields: the SWENSE solver builds alpha/U/p from the incident
+#    wave (alphaI, UInc, pInc) itself; 0.orig holds the complementary fields
+#    Uc = 0, pc = 0, so no setFields is needed here.
+
+# 3. Run (serial). Wave gauges, forces (p, pInc, pc) and 6-DoF state are
+#    written by the function objects in system/controlDict -> postProcessing/
+runApplication $SOLVER
+
+#------------------------------------------------------------------------------

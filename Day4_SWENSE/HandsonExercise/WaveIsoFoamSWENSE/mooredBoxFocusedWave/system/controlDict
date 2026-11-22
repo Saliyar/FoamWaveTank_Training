@@ -1,0 +1,176 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           |
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     waveIsoFoamSWENSE;
+startFrom       startTime;
+startTime       0;
+stopAt          endTime;
+endTime         15;             // focus at 10 s, as Day 2
+deltaT          0.0008;
+writeControl    adjustableRunTime;
+writeInterval   0.1;
+purgeWrite      0;
+writeFormat     ascii;
+writePrecision  16;
+writeCompression off;
+timeFormat      general;
+timePrecision   8;
+runTimeModifiable no;
+// Phase C shared numerics: fixed step (Rev1 has no adjustable time step)
+adjustTimeStep  yes;
+maxCo           0.5;
+maxAlphaCo      0.5;
+maxDeltaT       0.005;          // the tank is almost still before the group arrives
+libs            ( "libwaves2Foam.so" "libGrid2Grid.so" moorDynR2SixDoF );
+functions
+{
+    surfaceElevation
+    {
+        type            surfaceElevation;
+        libs            ( "libwaves2Foam.so" "libwaves2FoamSampling.so" );
+        writeControl    runTime;
+        writeInterval   0.02;
+        setFormat       raw;
+        interpolationScheme cellPointFace;
+        fields          (alpha.water);
+        // sets must be a dictionary { }: waveIsoFoamSWENSE reads it for its level log
+        sets
+        {
+            gauge_0
+            {
+                type    face;
+                axis    z;
+                start   (-2 0 -0.499);
+                end     (-2 0 0.499);
+                nPoints 100;
+            }
+            gauge_1
+            {
+                type    face;
+                axis    z;
+                start   (-1.5 0 -0.499);
+                end     (-1.5 0 0.499);
+                nPoints 100;
+            }
+            gauge_2
+            {
+                type    face;
+                axis    z;
+                start   (-1 0 -0.499);
+                end     (-1 0 0.499);
+                nPoints 100;
+            }
+            gauge_3
+            {
+                type    face;
+                axis    z;
+                start   (-0.5 0 -0.499);
+                end     (-0.5 0 0.499);
+                nPoints 100;
+            }
+            gauge_4
+            {
+                type    face;
+                axis    z;
+                start   (-0.25 0 -0.499);
+                end     (-0.25 0 0.499);
+                nPoints 100;
+            }
+            gauge_5
+            {
+                type    face;
+                axis    z;
+                start   (0.25 0 -0.499);
+                end     (0.25 0 0.499);
+                nPoints 100;
+            }
+            gauge_6
+            {
+                type    face;
+                axis    z;
+                start   (0.5 0 -0.499);
+                end     (0.5 0 0.499);
+                nPoints 100;
+            }
+            gauge_7
+            {
+                type    face;
+                axis    z;
+                start   (1 0 -0.499);
+                end     (1 0 0.499);
+                nPoints 100;
+            }
+            gauge_8
+            {
+                type    face;
+                axis    z;
+                start   (1.5 0 -0.499);
+                end     (1.5 0 0.499);
+                nPoints 100;
+            }
+            gauge_9
+            {
+                type    face;
+                axis    z;
+                start   (2 0 -0.499);
+                end     (2 0 0.499);
+                nPoints 100;
+            }
+        }
+    }
+    sixDoFState
+    {
+        type            sixDoFRigidBodyState;
+        libs            ( sixDoFRigidBodyState );
+        angleFormat     degrees;
+        writeControl    timeStep;
+        writeInterval   1;
+    }
+    box_forces
+    {
+        type            forces;
+        libs            ( forces );
+        patches         ( box );
+        pName           p;
+        rho             rho;
+        CofR            ( 0 0 0 );
+        writeControl    timeStep;
+        writeInterval   1;
+    }
+    box_forces_pInc
+    {
+        type            forces;
+        libs            ( forces );
+        patches         ( box );
+        pName           pInc;
+        rho             rho;
+        CofR            ( 0 0 0 );
+        writeControl    timeStep;
+        writeInterval   1;
+    }
+    box_forces_pc
+    {
+        type            forces;
+        libs            ( forces );
+        patches         ( box );
+        pName           pc;
+        rho             rho;
+        CofR            ( 0 0 0 );
+        writeControl    timeStep;
+        writeInterval   1;
+    }
+}

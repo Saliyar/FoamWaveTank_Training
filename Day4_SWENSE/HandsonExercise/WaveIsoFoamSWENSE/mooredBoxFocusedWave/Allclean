@@ -3,7 +3,9 @@ cd "${0%/*}" || exit 1
 . ${WM_PROJECT_DIR:?}/bin/tools/CleanFunctions
 
 cleanCase0
+rm -f system/meshSize
 rm -f case.foam
+./HOS/Allclean
 # MoorDyn output (keep the input file lines_v2_bodyC.txt)
 rm -rf Mooring/VTK Mooring/VTP Mooring/Mooring.pvd Mooring/*.out Mooring/*.log
 rm -rf mdv2_body*

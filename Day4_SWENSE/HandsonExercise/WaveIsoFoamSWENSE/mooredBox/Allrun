@@ -23,8 +23,17 @@ touch case.foam
 restore0Dir
 
 # 1. Mesh (identical to Day 3) + the SWENSE body zone
+# Mesh size: MESH=coarse | medium (default) | fine, e.g.  MESH=coarse ./Allrun
+MESH=${MESH:-medium}
+[ -f system/meshSize.$MESH ] || { echo "MESH must be coarse, medium or fine"; exit 1; }
+cp system/meshSize.$MESH system/meshSize
+
 runApplication blockMesh
-cp constant/cellZones.bodyZone constant/polyMesh/cellZones
+if [ "$MESH" = medium ]; then
+    cp constant/cellZones.bodyZone constant/polyMesh/cellZones
+else
+    runApplication topoSet -dict system/topoSetDict.bodyZone   # the same region: |x| < 0.5 m, z < 0.1118 m
+fi
 runApplication checkMesh
 
 # 2. Initial fields: the SWENSE solver builds alpha/U/p from the incident

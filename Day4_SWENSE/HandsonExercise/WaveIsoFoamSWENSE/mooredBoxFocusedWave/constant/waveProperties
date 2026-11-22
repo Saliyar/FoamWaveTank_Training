@@ -1,0 +1,63 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      waveProperties;
+}
+
+// Incident wave from HOS-NWT (HOS/), read through Grid2Grid
+externalForcing Grid2Grid;
+airFill         air2air;
+limitedClosure  true;
+limitedClosureRatio 2;
+plainBodyZone   bodyZone;
+seaLevel        0;
+rampTsoft       2;              // start-up ramp of the incident wave [s]
+relaxationNames ();
+
+Grid2GridCoeffs
+{
+    waveType                Grid2Grid;
+    Grid2GridInputFileName  Grid2Grid.dict;     // in constant/
+
+    // x_HOS = x_CFD - referencePosition,   t_HOS = t_CFD + referenceTime
+    referencePosition       (-9 0 0);           // the body is at HOS x = 9 m
+    referenceTheta          0;
+    referenceTime           15;
+    Tsoft                   0;                  // must be 0 (use rampTsoft)
+}
+
+farfieldCoeffs
+{
+    zCutOff             0.5;
+    relaxationZone
+    {
+        farfieldPatchNames  (inlet outlet);
+        farfieldDistances   (1.0 1.0);          // zone lengths at inlet, outlet [m]
+        blendingDistances   (1.0 1.0);          // blended part of the zones [m]
+        spatialExponent     3.5;                // shape of the weight
+    }
+    Air2Air
+    {
+        order           3;
+        pressureModel   linear;
+        verbose         yes;
+        cutoff          auto;
+        cutoffC         1;
+        modesFile       "HOS/Results/modes_HOS_SWENSE.dat";
+        rhoAir          1;
+    }
+}
+
+// SWENSE boundary wave blocks: no ramp
+inletCoeffs
+{
+    rampTime    0;
+    wind        (0 0 0);
+}
+outletCoeffs
+{
+    rampTime    0;
+    wind        (0 0 0);
+}
