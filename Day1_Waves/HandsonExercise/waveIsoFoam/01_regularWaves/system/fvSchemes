@@ -63,4 +63,8 @@ fluxRequired
     alpha.water;
 }
 
+// FoamWaveTank and FloatStepper solvers: "on" (default) keeps the ddtCorr
+// flux correction in the pressure equation, "off" leaves it out
+ddtCorr         on;
+
 // ************************************************************************* //

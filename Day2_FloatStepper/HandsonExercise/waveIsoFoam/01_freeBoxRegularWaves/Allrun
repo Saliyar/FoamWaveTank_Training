@@ -12,10 +12,8 @@
 cd "${0%/*}" || exit 1
 . ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
 
-# waveIsoFoam build with moving-mesh support (as Day 3); override with SOLVER=/path/waveIsoFoam
-FWT_PLAIN=${FWT_PLAIN:-/gpfs/hpc-home/projects/dtu_00075/apps/FoamWaveTank/fwt_rev1_floating/private}
-SOLVER=${SOLVER:-$FWT_PLAIN/bin/waveIsoFoam}
-[ -d "$FWT_PLAIN/lib" ] && export LD_LIBRARY_PATH="$FWT_PLAIN/lib:$LD_LIBRARY_PATH"
+# Solver: waveIsoFoam from FoamWaveTank. Override with SOLVER=/path/to/waveIsoFoam ./Allrun
+SOLVER=${SOLVER:-waveIsoFoam}
 
 touch case.foam
 restore0Dir
