@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this course material, please cite it as below."
+title: "FoamWaveTank Training: hands-on exercises and student projects for wave-structure interaction with OpenFOAM"
+authors:
+  - name: "The FoamWaveTank Training contributors"
+repository-code: "https://github.com/Saliyar/FoamWaveTank_Training"
+license: GPL-3.0-or-later
+date-released: 2026-11-23
+keywords:
+  - OpenFOAM
+  - waves2Foam
+  - waveIsoFoam
+  - MoorDyn
+  - floating body
+  - course material
