@@ -94,3 +94,11 @@ for accuracy; use the course set-up to learn the method.
 
 After case 01: `python3 compareExpNum.py` compares surge, heave and pitch
 with the experiment (`Ren2015data/`).
+
+## Slides
+
+`Slides/Day2_FloatStepper_HandsOn.pdf` is the background for the hands-on: rigid-body
+coupling and the added-mass problem, FloatStepper vs. sixDoFRigidBodyMotion, mesh motion,
+the case set-up, output and the HOS waves. To edit it, change
+`Slides/Day2_FloatStepper_HandsOn.tex` (LaTeX Beamer) and run
+`pdflatex Day2_FloatStepper_HandsOn.tex` twice in `Slides/`.

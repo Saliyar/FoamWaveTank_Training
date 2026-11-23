@@ -96,3 +96,10 @@ writes `Mooring/VTP/mooring_<time>.vtp` plus the time series `Mooring/Mooring.pv
 Open `case.foam` and `Mooring/Mooring.pvd` together in ParaView; the times
 match the flow solution. Colour the lines by `Tension` (N per segment) or
 `LineID`. Needs only numpy.
+
+## Slides
+
+`Slides/Day3_MooredBox_HandsOn.pdf` is the background for the hands-on: MoorDyn and its
+input file, the coupling to the body solver, mesh, waves, output, the mooring in ParaView,
+the HOS waves and the validation. To edit it, change `Slides/Day3_MooredBox_HandsOn.tex`
+(LaTeX Beamer) and run `pdflatex Day3_MooredBox_HandsOn.tex` twice in `Slides/`.
