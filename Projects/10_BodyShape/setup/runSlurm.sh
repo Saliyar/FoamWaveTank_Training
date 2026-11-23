@@ -13,6 +13,7 @@ export PAGER=cat MODULES_PAGER=cat
 module use /services/tools/modulefiles
 module load tools gcc/14.2.0 gsl/2.7 fftw/3.3.10 ucx/1.20.0 openmpi/5.0.2 cuda/toolkit/11.0.3 openfoam.com/2506
 source /services/tools/openfoam.com/2506/OpenFOAM-v2506/etc/bashrc
+# waveIsoFoam and the FoamWaveTank libraries: $FOAM_USER_APPBIN, $FOAM_USER_LIBBIN (./Allwmake)
 export OMPI_MCA_pml=ob1 OMPI_MCA_btl=self,vader
 export NP=${SLURM_NTASKS}
 cd "$SLURM_SUBMIT_DIR" || exit 1

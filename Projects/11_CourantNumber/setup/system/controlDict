@@ -1,61 +1,63 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-  =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           |
-     \\/     M anipulation  |
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2506                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 FoamFile
 {
-    version     2.0;
-    format      ascii;
-    class       dictionary;
-    location    "system";
-    object      controlDict;
+    version         2;
+    format          ascii;
+    class           dictionary;
+    location        "system";
+    object          controlDict;
 }
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     waveIsoFoamSWENSE;
+application     waveIsoFoam;
+
 startFrom       startTime;
+
 startTime       0;
+
 stopAt          endTime;
+
 endTime         23;
-deltaT          0.0008;
+
+deltaT          0.00125;
+
 writeControl    adjustableRunTime;
+
 writeInterval   0.5;        // fields for ParaView
+
 purgeWrite      0;
+
 writeFormat     ascii;
+
 writePrecision  10;
+
 writeCompression off;
+
 timeFormat      general;
+
 timePrecision   8;
-runTimeModifiable no;
+
+runTimeModifiable yes;
+
 // Adaptive time step
 adjustTimeStep  yes;
+
 maxCo           0.5;        // Courant limit in all cells
+
 maxAlphaCo      0.5;        // Courant limit at the free surface
+
 maxDeltaT       1;
-libs            ( "libwaves2Foam.so" "libGrid2Grid.so" moorDynR2SixDoF );
+
+libs            ( "libwaves2Foam.so" "libGrid2Grid.so" waveModels moorDynR2SixDoF );
+
 functions
 {
-    waveGauges
-    {
-        type            interfaceHeight;
-        libs            ( fieldFunctionObjects );
-        alpha           alpha.water;
-        direction       (0 0 -1);   // gravity direction (interfaceHeight)
-        locations       ( ( -2 0 -0.45 ) ( -1.5 0 -0.45 ) ( -1 0 -0.45 ) ( -0.5 0 -0.45 ) ( -0.25 0 -0.45 ) ( 0.25 0 -0.45 ) ( 0.5 0 -0.45 ) ( 1 0 -0.45 ) ( 1.5 0 -0.45 ) ( 2 0 -0.45 ) );
-        writeControl    timeStep;
-        writeInterval   1;
-    }
-    sixDoFState
-    {
-        type            sixDoFRigidBodyState;
-        libs            ( sixDoFRigidBodyState );
-        angleFormat     degrees;
-        writeControl    timeStep;
-        writeInterval   1;
-    }
     box_forces
     {
         type            forces;
@@ -67,26 +69,25 @@ functions
         writeControl    timeStep;
         writeInterval   1;
     }
-    box_forces_pInc
+    sixDoFState
     {
-        type            forces;
-        libs            ( forces );
-        patches         ( box );
-        pName           pInc;
-        rho             rho;
-        CofR            ( 0 0 0 );
+        type            sixDoFRigidBodyState;
+        libs            ( sixDoFRigidBodyState );
+        angleFormat     degrees;
         writeControl    timeStep;
         writeInterval   1;
     }
-    box_forces_pc
+    waveGauges
     {
-        type            forces;
-        libs            ( forces );
-        patches         ( box );
-        pName           pc;
-        rho             rho;
-        CofR            ( 0 0 0 );
+        type            interfaceHeight;
+        libs            ( fieldFunctionObjects );
+        alpha           alpha.water;
+        direction       (0 0 -1);   // gravity direction (interfaceHeight)
+        locations       ( ( -2 0 -0.45 ) ( -1.5 0 -0.45 ) ( -1 0 -0.45 ) ( -0.5 0 -0.45 ) ( -0.25 0 -0.45 ) ( 0.25 0 -0.45 ) ( 0.5 0 -0.45 ) ( 1 0 -0.45 ) ( 1.5 0 -0.45 ) ( 2 0 -0.45 ) );
         writeControl    timeStep;
         writeInterval   1;
     }
 }
+
+
+// ************************************************************************* //

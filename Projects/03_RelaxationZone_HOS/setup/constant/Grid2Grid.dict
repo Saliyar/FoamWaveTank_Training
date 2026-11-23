@@ -1,12 +1,21 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2506                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
 FoamFile
 {
     version     2.0;
     format      ascii;
     class       dictionary;
+    location    "constant";
     object      Grid2Grid.dict;
 }
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// HOS-NWT result read by Grid2Grid (path relative to the case folder)
+// HOS-NWT result read by Grid2Grid. filePath is relative to the case folder.
 Grid2Grid       HOSNWT;
 
 HOSNWT
@@ -16,12 +25,14 @@ HOSNWT
     filePath            HOS/Results/modes_HOS_SWENSE.dat;
     interpolationOrder  3;          // cubic in time and space
 
-    // Vertical grid on which Grid2Grid rebuilds the HOS velocity
+    // Vertical grid on which Grid2Grid rebuilds the HOS velocity (z = 0: still water level)
     zMeshType           meshRatio;
     zMin                -0.5;       // bottom
-    zMax                 0.5;       // top of the CFD domain
+    zMax                0.5;        // top of the CFD domain
     nZMin               50;
     nZMax               50;
     zMinRatio           3;
     zMaxRatio           3;
 }
+
+// ************************************************************************* //

@@ -1,14 +1,15 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-  =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           |
-     \\/     M anipulation  |
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2506                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
     version     2.0;
     format      ascii;
+    arch        "LSB;label=64;scalar=64";
     class       volScalarField;
     location    "0";
     object      alpha.water;
@@ -23,27 +24,17 @@ boundaryField
 {
     inlet
     {
-        type swenseWaveAlpha;
-        value uniform 0;
+        type            waveAlpha;
+        waveDictName    waveProperties;
+        value           uniform 0;
     }
     outlet
     {
-        type swenseWaveAlpha;
-        value uniform 0;
+        type            zeroGradient;
     }
     bottom
     {
-        type zeroGradient;
-    }
-    atmosphere
-    {
-        type inletOutlet;
-        inletValue uniform 0;
-        value uniform 0;
-    }
-    box
-    {
-        type zeroGradient;
+        type            zeroGradient;
     }
     wall1
     {
@@ -53,4 +44,17 @@ boundaryField
     {
         type zeroGradient;
     }
+    box
+    {
+        type            zeroGradient;
+    }
+    atmosphere
+    {
+        type            inletOutlet;
+        inletValue      uniform 0;
+        value           uniform 0;
+    }
 }
+
+
+// ************************************************************************* //

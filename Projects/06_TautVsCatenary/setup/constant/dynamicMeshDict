@@ -23,8 +23,8 @@ motionSolver        sixDoFRigidBodyMotion;
 sixDoFRigidBodyMotionCoeffs
 {
     patches         (box);
-    innerDistance   0.04;       // wider morphing band than Day 3 (0.075, 0.4): the surge
-    outerDistance   0.8;        // collapses the Day 3 band (fine mesh, taut lines, curved bodies)
+    innerDistance   0.075;
+    outerDistance   0.4;
 
     rho             rho;
 

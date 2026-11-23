@@ -1,14 +1,15 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-  =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           |
-     \\/     M anipulation  |
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2206                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
     version     2.0;
-    format      ascii;
+    format      binary;
+    arch        "LSB;label=32;scalar=64";
     class       volVectorField;
     location    "0";
     object      U;
@@ -21,36 +22,38 @@ internalField   uniform (0 0 0);
 
 boundaryField
 {
-    inlet
+     box
     {
-        type swenseWaveVelocity;
-        value uniform (0 0 0);
+        type        movingWallVelocity;
+        value       uniform (0 0 0);
     }
-    outlet
-    {
-        type swenseWaveVelocity;
-        value uniform (0 0 0);
-    }
-    bottom
-    {
-        type slip;
-    }
-    atmosphere
-    {
-        type pressureInletOutletVelocity;
-        value uniform (0 0 0);
-    }
-    box
-    {
-        type movingWallVelocity;
-        value uniform (0 0 0);
-    }
+    
     wall1
     {
-        type            empty;
+        type        empty;
     }
     wall2
     {
-        type            empty;
+        type        empty;
+    }
+    inlet
+    {
+        type        zeroGradient;
+    }
+    outlet
+    {
+        type        zeroGradient;
+    }
+    atmosphere
+    {
+        type        pressureInletOutletVelocity;
+        value       uniform (0 0 0);
+    }
+    bottom
+    {
+        type        noSlip;
     }
 }
+
+
+// ************************************************************************* //

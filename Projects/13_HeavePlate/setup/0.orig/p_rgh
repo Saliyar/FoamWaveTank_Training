@@ -1,14 +1,15 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-  =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           |
-     \\/     M anipulation  |
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2206                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
     version     2.0;
-    format      ascii;
+    format      binary;
+    arch        "LSB;label=32;scalar=64";
     class       volScalarField;
     location    "0";
     object      p_rgh;
@@ -21,45 +22,53 @@ internalField   uniform 0;
 
 boundaryField
 {
-    inlet
-    {
-        type fixedFluxPressure;
-        gradient uniform 0;
-        value uniform 0;
-    }
-    outlet
-    {
-        type fixedFluxPressure;
-        gradient uniform 0;
-        value uniform 0;
-    }
-    bottom
-    {
-        type fixedFluxPressure;
-        gradient uniform 0;
-        value uniform 0;
-    }
-    atmosphere
-    {
-        type totalPressure;
-        rho rho;
-        psi none;
-        gamma 1;
-        p0 uniform 0;
-        value uniform 0;
-    }
-    box
-    {
-        type fixedFluxPressure;
-        gradient uniform 0;
-        value uniform 0;
-    }
     wall1
     {
-        type            empty;
+        type             empty;
+        gradient         uniform 0;
+        value            uniform 0;
     }
+
     wall2
     {
-        type            empty;
+        type             empty;
+        gradient         uniform 0;
+        value            uniform 0;
+    }
+
+    inlet
+    {
+        type            fixedFluxExtrapolatedPressure;
+    }
+
+    outlet
+    {
+        type            fixedFluxExtrapolatedPressure;
+    }
+
+    atmosphere
+    {
+        type            totalPressure;
+        rho             rho;
+        psi             none;
+        gamma           1;
+        p0              uniform 0;
+        value           uniform 0;
+    }
+
+    box
+    {
+        type            fixedFluxPressure;
+        value           uniform 0;
+    }
+
+    bottom
+    {
+        type             fixedFluxExtrapolatedPressure;
+        gradient         uniform 0;
+        value            uniform 0;
     }
 }
+
+
+// ************************************************************************* //

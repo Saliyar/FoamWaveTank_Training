@@ -14,7 +14,7 @@ boundaryField
     inlet       { type inletOutlet; inletValue uniform 9e-06; value uniform 9e-06; }
     outlet      { type inletOutlet; inletValue uniform 9e-06; value uniform 9e-06; }
     atmosphere  { type inletOutlet; inletValue uniform 9e-06; value uniform 9e-06; }
-    bottom      { type zeroGradient; }      // slip bottom
+    bottom      { type zeroGradient; }
     box         { type epsilonWallFunction; value uniform 9e-06; }
     wall1       { type empty; }
     wall2       { type empty; }

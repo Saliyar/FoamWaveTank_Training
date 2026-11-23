@@ -1,4 +1,4 @@
-# HOS-NWT - incident wave of the project case
+# HOS-NWT - incident focused wave of the moored box
 # 20 m tank, 0.5 m deep, wavemaker at x = 0, beach from x = 15 m.
 # The body (CFD x = 0) is at HOS x = 9 m.
 wave tank:
@@ -46,4 +46,4 @@ output:
   HDF5: false
   probes:
     type: free surface elevation
-    position file: prob.inp      # x = 7 .. 11 m (CFD gauges x = 3 .. 7 m)
+    position file: prob.inp      # at the CFD gauges and the box centre (x = 9 m)

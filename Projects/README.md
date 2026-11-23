@@ -1,15 +1,16 @@
 # Student projects - moored floating box in waves
 
-Thirteen projects of 12-16 hours, to be done after Days 1-4. All start from the
-Day 3 moored box, solved with `waveIsoFoamSWENSE` (the Day 4 set-up). Each folder
-has the problem description (`<project>.pdf`) and one ready case (`setup/`).
+Thirteen projects of 12-16 hours, to be done after Days 1-3. All start from the
+Day 3 moored box, solved with `waveIsoFoam` of FoamWaveTank
+(`sixDoFRigidBodyMotion` + MoorDyn v2, `moorDynR2` restraint). Each folder has the
+problem description (`<project>.pdf`) and one ready, tested case (`setup/`).
 **Read the PDF first.**
 
 | # | Project | You vary | How |
 |---|---------|----------|-----|
 | 1 | [Wave height](01_WaveHeight/01_WaveHeight.pdf) | H | `constant/waveProperties` |
 | 2 | [Wave period](02_WavePeriod/02_WavePeriod.pdf) | T at H = 0.06 m | `constant/waveProperties` |
-| 3 | [Relaxation zone, HOS wave](03_RelaxationZone_HOS/03_RelaxationZone_HOS.pdf) | zone length and shape | `constant/waveProperties`, `HOS/` |
+| 3 | [Relaxation zone, HOS wave](03_RelaxationZone_HOS/03_RelaxationZone_HOS.pdf) | zone length and shape | `constant/waveProperties.input` |
 | 4 | [Mass and draft](04_MassDraft/04_MassDraft.pdf) | draft, mass | `python3 setBox.py --draft ..` |
 | 5 | [Inertia](05_Inertia/05_Inertia.pdf) | Iyy | `constant/dynamicMeshDict` |
 | 6 | [Taut and catenary mooring](06_TautVsCatenary/06_TautVsCatenary.pdf) | mooring system | `MOORING=taut ./Allrun` |
@@ -36,9 +37,11 @@ NP=8 ./Allrun               # default 4 cores; NP=1 is serial
 On the DTU cluster use `sbatch runSlurm.sh` in the case folder. Options are passed
 on with `sbatch --export=ALL,MESH=coarse runSlurm.sh`.
 
-The setups use the Day 4 development solver (see the top of each `Allrun`; set
-`FWT_DYN` or `SOLVER` for another build). Projects 3 and 7 also need HOS-NWT
-(`HOSNWT=/path/to/HOS-NWT`).
+The setups use `waveIsoFoam` from `./Allwmake` of FoamWaveTank (set `SOLVER` for
+another build). Projects 3 and 7 also need HOS-NWT (`HOSNWT=/path/to/HOS-NWT`):
+the wave is computed in `HOS/` and imposed in waves2Foam relaxation zones. All
+other projects generate the wave at the inlet with OpenFOAM `waveModels`, as on
+Day 3. A 23 s run of the default case takes about 35-75 minutes on 8 cores.
 
 ## Comparing runs
 
@@ -52,15 +55,12 @@ It prints mean, amplitude, first and second harmonic, maximum and minimum of
 motions, tensions, wave gauges and forces. For the mooring lines in ParaView run
 `python3 ../../../Tools/mooringToParaview.py` from a case folder.
 
-## Differences from the Day 4 case
+## Differences from the Day 3 case
 
-- Parallel by default; fields written every 0.5 s.
-- Projects 6, 10 and 12 use a wider mesh-morphing band (`innerDistance 0.04`,
-  `outerDistance 0.8`): with the Day 3 band (0.075, 0.4) the cells collapsed at
-  the largest surge (about 4 s) with taut lines, curved or 3D bodies and on the
-  fine mesh. The wide band moves cells outside the bodyZone and changes the
-  results (mostly the pitch second harmonic), so compare only runs with the same
-  band. In the other projects `MESH=fine` asks for the wide band before it runs.
+- Parallel by default; fields written every 0.5 s; wave gauges at x = -2 ... 2 m.
+- All projects keep the Day 3 mesh-morphing band (`innerDistance 0.075`,
+  `outerDistance 0.4`). It held in all test runs, also on the fine mesh, with
+  taut lines and with the curved and 3D bodies.
 - Project 9 solves k, omega and epsilon with `smoothSolver`.
-- Projects 4, 8, 10 and 13 make the body zone with `topoSet`
-  (the stored cell list of Day 4 is valid for one mesh only).
+- Projects 3 and 7 use waves2Foam relaxation zones (`constant/waveProperties.input`)
+  instead of the inlet and outlet boundary conditions.
