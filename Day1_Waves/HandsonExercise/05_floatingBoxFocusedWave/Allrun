@@ -5,7 +5,7 @@
 #   depth 0.4 m, x = -2 .. 8 m (inlet relaxation zone -2 .. 0).
 #   Wave:   NewWave (JONSWAP, Tp = 1.2 s, etaMax = 0.06 m) focused on the
 #           box position x = 2 m at t = 10 s  -> constant/waveProperties.input
-#   Solver: waveIsoFoam (the VOF + waves2Foam part of floatStepperWaveFoam)
+#   Solver: waveIsoFoam (the VOF + waves2Foam part of floatStepperWaveIsoFoam)
 #
 # Usage:  ./Allrun
 #   Wave gauges -> postProcessing/surfaceElevation (x = -1, 2, 1, 3, 4, 5 m)

@@ -16,7 +16,7 @@ FoamFile
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     waveIsoFoam;    // Day 2: floatStepperWaveFoam (same isoAdvector VOF + waves2Foam), here without the box
+application     waveIsoFoam;    // Day 2: floatStepperWaveIsoFoam (same isoAdvector VOF + waves2Foam), here without the box
 
 startFrom       latestTime;
 

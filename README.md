@@ -7,8 +7,8 @@ serial run) and an `Allclean` (resets the case to the state in git).
 | Day | Topic | Exercises (`DayN_*/HandsonExercise/`) | Solver |
 |-----|-------|----------------------------------------|--------|
 | 1 | Waves | `waveFoam/` and `waveIsoFoam/`, each with `01_regularWaves`, `02_irregularWaves`, `03_focusedWave`; `potentialFlowWaves/` | `waveFoam`, `waveIsoFoam`, HOS-NWT + Grid2Grid |
-| 2 | Free floating box | `waveIsoFoam/` and `FloatStepper/`, each with `01_freeBoxRegularWaves`, `02_freeBoxFocusedWave`; the same two in `HOS_FloatStepper/` | `waveIsoFoam` + sixDoF; `floatStepper`, `floatStepperWaveFoam`; HOS-NWT + Grid2Grid |
-| 3 | Moored floating box | `waveIsoFoam/mooredBox`, `FloatStepper/mooredBox`; `HOS_FloatStepper/mooredBox` and `mooredBoxFocusedWave` | `waveIsoFoam` + sixDoF + MoorDyn; `floatStepper` + MoorDyn; HOS-NWT + `floatStepperWaveFoam` |
+| 2 | Free floating box | `waveIsoFoam/` and `FloatStepper/`, each with `01_freeBoxRegularWaves`, `02_freeBoxFocusedWave`; the same two in `HOS_FloatStepper/` | `waveIsoFoam` + sixDoF; `floatStepper`, `floatStepperWaveIsoFoam`; HOS-NWT + Grid2Grid |
+| 3 | Moored floating box | `waveIsoFoam/mooredBox`, `FloatStepper/mooredBox`; `HOS_FloatStepper/mooredBox` and `mooredBoxFocusedWave` | `waveIsoFoam` + sixDoF + MoorDyn; `floatStepper` + MoorDyn; HOS-NWT + `floatStepperWaveIsoFoam` |
 | 4 | SWENSE on the moored box | `WaveIsoFoamSWENSE/mooredBox` and `mooredBoxFocusedWave`, `FloatStepperSWENSE/mooredBox` | `waveIsoFoamSWENSE`, `floatStepperSWENSE` |
 
 ## Student projects

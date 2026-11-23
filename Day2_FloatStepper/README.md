@@ -18,7 +18,7 @@ with two body-motion solvers, and with the wave from HOS-NWT:
 | Case (in both folders) | Wave | `FloatStepper/` | `waveIsoFoam/` |
 |------|------|------|------|
 | `01_freeBoxRegularWaves` | StokesV, H = 0.1 m, T = 1.2 s (OpenFOAM waveModels) | `floatStepper` | `waveIsoFoam` |
-| `02_freeBoxFocusedWave` | NewWave (JONSWAP, Tp = 1.2 s, crest 0.06 m) focused on the box at t = 10 s (waves2Foam) | `floatStepperWaveFoam` | `waveIsoFoam` |
+| `02_freeBoxFocusedWave` | NewWave (JONSWAP, Tp = 1.2 s, crest 0.06 m) focused on the box at t = 10 s (waves2Foam) | `floatStepperWaveIsoFoam` | `waveIsoFoam` |
 
 ## Course set-up: serial runs, `./Allrun`
 
@@ -44,7 +44,7 @@ build on the DTU cluster; elsewhere use `SOLVER=/path/to/waveIsoFoam ./Allrun`
 
 ## HOS-NWT + FloatStepper (`HandsonExercise/HOS_FloatStepper`)
 
-The same box, mesh and numerics as `FloatStepper/02_freeBoxFocusedWave` (`floatStepperWaveFoam`),
+The same box, mesh and numerics as `FloatStepper/02_freeBoxFocusedWave` (`floatStepperWaveIsoFoam`),
 with the Day 1 HOS waves in both relaxation zones and in the initial field.
 
 | Case | Wave (as Day 1 `potentialFlowWaves/HOS`) | CFD t = 0 is HOS | `endTime` | HOS + CFD, serial |

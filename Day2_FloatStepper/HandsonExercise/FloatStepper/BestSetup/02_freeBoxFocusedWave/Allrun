@@ -3,7 +3,7 @@
 # Day 2b - Freely floating box hit by a focused wave
 #   Same tank, box and mesh as Day 2a (tank extended upstream to x = -2 m
 #   for the waves2Foam inlet relaxation zone).
-#   Solver: floatStepperWaveFoam (FloatStepper + waves2Foam relaxation zones)
+#   Solver: floatStepperWaveIsoFoam (FloatStepper + waves2Foam relaxation zones)
 #   Wave:   NewWave (JONSWAP, Tp = 1.2 s, etaMax = 0.06 m) focused on the
 #           box centre x = 2 m at t = 10 s  -> constant/waveProperties.input
 #

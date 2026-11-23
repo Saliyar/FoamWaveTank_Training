@@ -4,7 +4,7 @@
 #   Wave:    JONSWAP group, Tp = 1.2 s, A = 0.06 m, depth 0.4 m, focus at the box at t = 10 s
 #   HOS:     HOS/  (run first if its Results are missing, 3-4 min)
 #   Mapping: constant/waveProperties.input (referencePosition, referenceTime)
-#   Solver:  floatStepperWaveFoam (FloatStepper + waves2Foam relaxation zones)
+#   Solver:  floatStepperWaveIsoFoam (FloatStepper + waves2Foam relaxation zones)
 #
 # Usage:
 #   ./Allrun        (serial)

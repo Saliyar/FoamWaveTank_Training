@@ -34,7 +34,7 @@ build on the DTU cluster; elsewhere use `SOLVER=/path/to/waveIsoFoam ./Allrun`
 
 ## HOS-NWT + FloatStepper (`HandsonExercise/HOS_FloatStepper`)
 
-The same mesh, box, mooring and numerics as `FloatStepper/mooredBox`, with `floatStepperWaveFoam`
+The same mesh, box, mooring and numerics as `FloatStepper/mooredBox`, with `floatStepperWaveIsoFoam`
 and the HOS wave in 1 m relaxation zones at both ends and in the initial field.
 
 | Case | Wave | CFD t = 0 is HOS | `endTime` | HOS + CFD, medium | `MESH=coarse` |
