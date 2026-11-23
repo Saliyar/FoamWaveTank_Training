@@ -67,3 +67,10 @@ HOS-NWT (`HOS/`) and then in a shorter CFD domain coupled to it with Grid2Grid
 `FloatingBoxRegularWaves`, `FloatingBoxFocusedWave` and `MooredBoxRegularWaves`.
 See `potentialFlowWaves/README.md`. HOS-NWT must be installed
 (https://gitlab.com/lheea/HOS-NWT).
+
+## Slides
+
+`Slides/Day1_Waves_HandsOn.pdf` is the background for the hands-on: wave input,
+mesh, gauges, boundary conditions, schemes, HOS-NWT and the Grid2Grid coupling.
+To edit it, change `Slides/Day1_Waves_HandsOn.tex` (LaTeX Beamer) and run
+`pdflatex Day1_Waves_HandsOn.tex` twice in `Slides/`.
