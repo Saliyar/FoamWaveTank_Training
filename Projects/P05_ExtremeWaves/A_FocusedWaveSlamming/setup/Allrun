@@ -1,0 +1,64 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# P05 part A - Focused wave slamming (HOS wave)
+#   Based on the Day 3 moored box, solved with waveIsoFoam (FoamWaveTank):
+#   sixDoFRigidBodyMotion + MoorDyn v2 (moorDynR2 restraint).
+#
+#   ./Allclean; ./Allrun
+#   NP=8 ./Allrun       number of cores (default 4; NP=1 is serial)
+#   MESH=coarse ./Allrun   coarse | medium (default) | fine
+#   HOSNWT=/path/to/HOS-NWT ./Allrun   the wave is computed first, in HOS/
+#
+# Solver: waveIsoFoam built by ./Allwmake of FoamWaveTank. Another build:
+#   SOLVER=/path/to/waveIsoFoam ./Allrun
+#------------------------------------------------------------------------------
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?Source OpenFOAM-v2506/etc/bashrc first}/bin/tools/RunFunctions
+
+if ls log.* >/dev/null 2>&1; then
+    echo "This case has results: run ./Allclean first, or copy the setup to a new folder"
+    exit 1
+fi
+
+NP=${NP:-4}
+SOLVER=${SOLVER:-waveIsoFoam}
+[ -x "$SOLVER" ] || command -v "$SOLVER" >/dev/null || { echo "Solver not found: $SOLVER (build FoamWaveTank first)"; exit 1; }
+
+# 0. Incident wave: HOS-NWT (skipped if HOS/Results is complete)
+./HOS/Allrun || exit 1
+
+touch case.foam
+restore0Dir
+MESH=${MESH:-medium}
+[ -f system/meshSize.$MESH ] || { echo "MESH must be coarse, medium or fine"; exit 1; }
+cp system/meshSize.$MESH system/meshSize
+
+# 1. Mesh
+runApplication blockMesh || exit 1
+runApplication checkMesh || exit 1
+
+# 2. Wave set-up and initial field from the HOS solution
+runApplication setWaveParameters || exit 1
+runApplication relaxationZoneLayout || exit 1
+runApplication setWaveField || exit 1
+grep -q "Grid2Grid Time" log.setWaveField || {
+    echo "This setWaveField does not update Grid2Grid to the start time: update FoamWaveTank"
+    exit 1
+}
+
+# 3. Run
+if [ "$NP" -gt 1 ]; then
+    cat > system/decomposeParDict <<EOF
+FoamFile { version 2.0; format ascii; class dictionary; object decomposeParDict; }
+numberOfSubdomains $NP;
+method simple;
+coeffs { n ($NP 1 1); }
+EOF
+    runApplication decomposePar || exit 1
+    runParallel "$SOLVER" || { echo "Solver failed, see log.${SOLVER##*/}"; exit 1; }
+    runApplication reconstructPar -newTimes
+else
+    runApplication "$SOLVER" || { echo "Solver failed, see log.${SOLVER##*/}"; exit 1; }
+fi
+
+#------------------------------------------------------------------------------

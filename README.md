@@ -13,9 +13,11 @@ serial run) and an `Allclean` (resets the case to the state in git).
 
 ## Student projects
 
-`Projects/` has 13 projects of 12-16 hours based on the Day 3 moored box, solved
-with `waveIsoFoam` + sixDoF + MoorDyn v2 (no SWENSE). Each has a problem
-description (PDF) and one tested setup; see [Projects/README.md](Projects/README.md).
+`Projects/` has 6 group projects (P01 Waves Severity, P02 Floating Properties,
+P03 Floating Shape and Damping, P04 Mooring Properties, P05 Extreme Waves,
+P06 OpenFOAM parameters), made of 13 parts of 12-16 hours based on the Day 3 moored
+box, solved with `waveIsoFoam` + sixDoF + MoorDyn v2 (no SWENSE). Each group has a
+problem description (PDF) and each part one tested setup; see [Projects/README.md](Projects/README.md).
 
 ## Requirements
 
