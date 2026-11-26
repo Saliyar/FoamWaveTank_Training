@@ -1,0 +1,37 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# Day 4 - Wave only (empty Day 3 tank), waveIsoFoamSWENSE
+#   The Day 3 tank and Stokes II wave without the box. SWENSE solves only the
+#   complementary field (Uc, pc) in bodyZone (|x| < 0.5 m); with no body it
+#   must stay zero, and the wave at the gauges is the incident Stokes II wave.
+#   Compare with ../waveIsoFoam (same mesh, same wave):
+#     python3 ../../../../Tools/compareSWENSE.py waves ../waveIsoFoam ../waveIsoFoamSWENSE
+# Usage:  ./Allrun   or   MESH=coarse ./Allrun
+#------------------------------------------------------------------------------
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
+
+SOLVER=${SOLVER:-waveIsoFoamSWENSE}
+
+touch case.foam
+restore0Dir
+
+# 1. Mesh (identical to Day 3) + the SWENSE body zone
+# Mesh size: MESH=coarse | medium (default) | fine, e.g.  MESH=coarse ./Allrun
+MESH=${MESH:-medium}
+[ -f system/meshSize.$MESH ] || { echo "MESH must be coarse, medium or fine"; exit 1; }
+cp system/meshSize.$MESH system/meshSize
+
+runApplication blockMesh
+runApplication topoSet -dict system/topoSetDict.bodyZone   # the same region: |x| < 0.5 m, z < 0.1118 m
+runApplication checkMesh
+
+# 2. Initial fields: the SWENSE solver builds alpha/U/p from the incident
+#    wave (alphaI, UInc, pInc) itself; 0.orig holds the complementary fields
+#    Uc = 0, pc = 0, so no setFields is needed here.
+
+# 3. Run (serial). Wave gauges are
+#    written by the function objects in system/controlDict -> postProcessing/
+runApplication $SOLVER
+
+#------------------------------------------------------------------------------

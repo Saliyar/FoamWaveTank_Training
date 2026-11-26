@@ -1,0 +1,139 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           |
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     waveIsoFoamSWENSE;
+startFrom       startTime;
+startTime       0;
+stopAt          endTime;
+endTime         23;
+deltaT          0.0008;
+writeControl    adjustableRunTime;
+writeInterval   0.1;
+purgeWrite      0;
+writeFormat     ascii;
+writePrecision  16;
+writeCompression off;
+timeFormat      general;
+timePrecision   8;
+runTimeModifiable no;
+// Phase C shared numerics: fixed step (Rev1 has no adjustable time step)
+// After the relaxation, alphaI is reset to the exact wetted fraction of the incident
+// wave outside plainBodyZone, and alpha1 takes the same increment (needs alphaHExact).
+alphaIExactReset yes;
+
+adjustTimeStep  yes;
+maxCo           0.5;
+maxAlphaCo      0.5;
+maxDeltaT       1;
+libs            ( "libwaves2Foam.so" "libGrid2Grid.so" );
+functions
+{
+    surfaceElevation
+    {
+        type            surfaceElevation;
+        libs            ( "libwaves2Foam.so" "libwaves2FoamSampling.so" );
+        writeControl    runTime;
+        writeInterval   0.02;
+        setFormat       raw;
+        interpolationScheme cellPointFace;
+        fields          (alpha.water);
+        // sets must be a dictionary { }: waveIsoFoamSWENSE reads it for its level log
+        sets
+        {
+            gauge_0
+            {
+                type    face;
+                axis    z;
+                start   (-2 0 -0.499);
+                end     (-2 0 0.499);
+                nPoints 100;
+            }
+            gauge_1
+            {
+                type    face;
+                axis    z;
+                start   (-1.5 0 -0.499);
+                end     (-1.5 0 0.499);
+                nPoints 100;
+            }
+            gauge_2
+            {
+                type    face;
+                axis    z;
+                start   (-1 0 -0.499);
+                end     (-1 0 0.499);
+                nPoints 100;
+            }
+            gauge_3
+            {
+                type    face;
+                axis    z;
+                start   (-0.5 0 -0.499);
+                end     (-0.5 0 0.499);
+                nPoints 100;
+            }
+            gauge_4
+            {
+                type    face;
+                axis    z;
+                start   (-0.25 0 -0.499);
+                end     (-0.25 0 0.499);
+                nPoints 100;
+            }
+            gauge_5
+            {
+                type    face;
+                axis    z;
+                start   (0.25 0 -0.499);
+                end     (0.25 0 0.499);
+                nPoints 100;
+            }
+            gauge_6
+            {
+                type    face;
+                axis    z;
+                start   (0.5 0 -0.499);
+                end     (0.5 0 0.499);
+                nPoints 100;
+            }
+            gauge_7
+            {
+                type    face;
+                axis    z;
+                start   (1 0 -0.499);
+                end     (1 0 0.499);
+                nPoints 100;
+            }
+            gauge_8
+            {
+                type    face;
+                axis    z;
+                start   (1.5 0 -0.499);
+                end     (1.5 0 0.499);
+                nPoints 100;
+            }
+            gauge_9
+            {
+                type    face;
+                axis    z;
+                start   (2 0 -0.499);
+                end     (2 0 0.499);
+                nPoints 100;
+            }
+        }
+    }
+}

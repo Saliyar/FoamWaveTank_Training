@@ -1,0 +1,34 @@
+#!/bin/sh
+#------------------------------------------------------------------------------
+# Day 4 - Wave only (empty Day 3 tank), plain waveIsoFoam
+#   The Day 3 tank and Stokes II wave (H = 0.1195 m, T = 1.993 s) without the box.
+#   Compare with ../waveIsoFoamSWENSE (same mesh, same wave):
+#     python3 ../../../../Tools/compareSWENSE.py waves ../waveIsoFoam ../waveIsoFoamSWENSE
+# Usage:  ./Allrun   or   MESH=coarse ./Allrun
+#------------------------------------------------------------------------------
+cd "${0%/*}" || exit 1
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
+
+# Solver: waveIsoFoam from FoamWaveTank. Override with SOLVER=/path/to/waveIsoFoam ./Allrun
+SOLVER=${SOLVER:-waveIsoFoam}
+
+touch case.foam
+restore0Dir
+
+# 1. Mesh
+# Mesh size: MESH=coarse | medium (default) | fine, e.g.  MESH=coarse ./Allrun
+MESH=${MESH:-medium}
+[ -f system/meshSize.$MESH ] || { echo "MESH must be coarse, medium or fine"; exit 1; }
+cp system/meshSize.$MESH system/meshSize
+
+runApplication blockMesh
+runApplication checkMesh
+
+# 2. Initial free surface (still water, z < 0)
+runApplication setFields
+
+# 3. Run (serial). Wave gauges are written by
+#    the function objects in system/controlDict -> postProcessing/
+runApplication $SOLVER
+
+#------------------------------------------------------------------------------

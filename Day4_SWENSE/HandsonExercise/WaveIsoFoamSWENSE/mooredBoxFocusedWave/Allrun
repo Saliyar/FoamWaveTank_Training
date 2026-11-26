@@ -8,17 +8,13 @@
 #   (cut 5 cell rows below the atmosphere, z < 0.1118).
 #   Adaptive dt (maxCo 0.5), level correction OFF (set-up of run E/S3).
 #
-# Solver: until the moving-body SWENSE is merged to master this case runs the
-# private build of commit 30df70a. Override with
-#         FWT_DYN=/path/to/build ./Allrun     (expects bin/ and lib/)
-#         SOLVER=/path/to/waveIsoFoamSWENSE ./Allrun
+# Solver: waveIsoFoamSWENSE from ./Allwmake of FoamWaveTank (master).
+#         Another build: SOLVER=/path/to/waveIsoFoamSWENSE ./Allrun
 #------------------------------------------------------------------------------
 cd "${0%/*}" || exit 1
 . ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
 
-FWT_DYN=${FWT_DYN:-/gpfs/hpc-home/projects/dtu_00075/apps/FoamWaveTank/fwt_rev1_floating/private_e5}
-SOLVER=${SOLVER:-$FWT_DYN/bin/waveIsoFoamSWENSE_dyn}
-[ -d "$FWT_DYN/lib" ] && export LD_LIBRARY_PATH="$FWT_DYN/lib:$LD_LIBRARY_PATH"
+SOLVER=${SOLVER:-waveIsoFoamSWENSE}
 
 # 0. Incident wave (skipped if HOS/Results is complete)
 ./HOS/Allrun || exit 1

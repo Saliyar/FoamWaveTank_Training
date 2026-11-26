@@ -21,6 +21,10 @@ airFill         air2air;
 limitedClosure  true;
 limitedClosureRatio 2;
 plainBodyZone   bodyZone;
+// Stokes II is a second-order theory: at this steepness (H/L = 0.03) its
+// free-surface residual is 13 % of omega*H/2, above the solver default of 0.005.
+// The check is there to catch wrong wave input; 0.2 accepts Stokes II here.
+incidentResidualMax 0.2;
 seaLevel        0;
 // Phase C5: start-up ramp of the incident (swenseRamp.H)
 rampTsoft       3;

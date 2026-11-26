@@ -9,7 +9,7 @@ serial run) and an `Allclean` (resets the case to the state in git).
 | 1 | Waves | `waveFoam/` and `waveIsoFoam/`, each with `01_regularWaves`, `02_irregularWaves`, `03_focusedWave`; `potentialFlowWaves/` | `waveFoam`, `waveIsoFoam`, HOS-NWT + Grid2Grid |
 | 2 | Free floating box | `waveIsoFoam/` and `FloatStepper/`, each with `01_freeBoxRegularWaves`, `02_freeBoxFocusedWave`; the same two in `HOS_FloatStepper/` | `waveIsoFoam` + sixDoF; `floatStepper`, `floatStepperWaveIsoFoam`; HOS-NWT + Grid2Grid |
 | 3 | Moored floating box | `waveIsoFoam/mooredBox`, `FloatStepper/mooredBox`; `HOS_FloatStepper/mooredBox` and `mooredBoxFocusedWave` | `waveIsoFoam` + sixDoF + MoorDyn; `floatStepper` + MoorDyn; HOS-NWT + `floatStepperWaveIsoFoam` |
-| 4 | SWENSE on the moored box | `WaveIsoFoamSWENSE/mooredBox` and `mooredBoxFocusedWave`, `FloatStepperSWENSE/mooredBox` | `waveIsoFoamSWENSE`, `floatStepperSWENSE` |
+| 4 | SWENSE: waves only and the moored box | `WaveOnly/waveIsoFoam` and `WaveOnly/waveIsoFoamSWENSE`; `WaveIsoFoamSWENSE/mooredBox` and `mooredBoxFocusedWave` | `waveIsoFoam`, `waveIsoFoamSWENSE` |
 
 ## Student projects
 
@@ -63,6 +63,9 @@ Post-processing scripts shared by all days live in `Tools/`.
   wave gauge of one or more cases (OpenFOAM `interfaceHeight`, waves2Foam gauges or
   HOS-NWT probes), e.g. to check that Day 1 to Day 4 have the same incident wave:
   `python3 Tools/waveStats.py <case1> <case2> --start 10`
+- `Tools/compareSWENSE.py` compares SWENSE with plain waveIsoFoam (Day 4): wave height at every
+  gauge against Stokes II theory (`waves`), or motions and tensions of the moored box (`moored`):
+  `python3 Tools/compareSWENSE.py waves <plain case> <SWENSE case> --plot waves.png`
 
 ## Status (Nov 2026)
 
@@ -73,12 +76,11 @@ Post-processing scripts shared by all days live in `Tools/`.
 - Day 3 runs in serial in 12 (`waveIsoFoam`) and 20 minutes (`FloatStepper`), or 6 and 8
   minutes with `MESH=coarse`.
 - Day 2 and Day 3 `HOS_FloatStepper` run in serial in 12 to 26 minutes including HOS-NWT.
-- Day 4 `WaveIsoFoamSWENSE` runs in serial in 16 minutes (regular), 6 with `MESH=coarse`,
-  and 10 minutes for the focused wave (needs HOS-NWT).
-  `FloatStepperSWENSE` is work in progress: it stops at about 1.5 s.
+- Day 4 runs in serial in 17 minutes (`WaveIsoFoamSWENSE/mooredBox`), 6 with `MESH=coarse`,
+  10 minutes for the focused wave (needs HOS-NWT) and 1-2 minutes for the `WaveOnly` cases
+  (medium mesh). All Day 4 cases run with `waveIsoFoamSWENSE` from FoamWaveTank master;
+  results against plain waveIsoFoam are in `Day4_SWENSE/README.md` and `Day4_SWENSE/Results/`.
 - Projects: 23 s of a default setup take about 35-75 minutes on 8 cores.
-- Day 4 runs the moving-body SWENSE solvers from development builds (see the
-  `Allrun` of each case); they will be in FoamWaveTank master before the course.
 
 ## Licence
 
